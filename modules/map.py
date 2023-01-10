@@ -7,4 +7,4 @@ def move(speedX, speedY, xy, map, width):
         xy[0] = yColl - speedY - width
     if xMap[xColl] == True:
         xy[1] = xColl - speedX - width
-    return 
+    return xy
