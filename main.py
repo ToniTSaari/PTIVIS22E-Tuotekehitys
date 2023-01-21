@@ -32,20 +32,20 @@ class Game:
             if self.y > 0 and self.y < 800 and self.x > 0 and self.x < 600:
                 if keys[pygame.K_w]:
                     self.y = self.y - 1
+                    if self.y == 0:
+                        self.y = 1
                 if keys[pygame.K_s]:
                     self.y = self.y + 1
+                    if self.y == 800:
+                        self.y = 799
                 if keys[pygame.K_d]:
                     self.x = self.x + 1
+                    if self.x == 600:
+                        self.x = 599
                 if keys[pygame.K_a]:
                     self.x = self.x - 1
-                if self.x == 0:
-                    self.x = 1
-                if self.x == 600:
-                    self.x = 599
-                if self.y == 0:
-                    self.y = 1
-                if self.y == 800:
-                    self.y = 799
+                    if self.x == 0:
+                        self.x = 1                
 
     def update(self):
         pass
