@@ -9,7 +9,10 @@ def init():
     screen = pygame.display.set_mode((800,600))
     screen.fill("pink")
 
-def run():
+#short explanation for __name__==__main__
+#It Allows You to Execute Code When the File Runs as a Script,
+# but Not When It’s Imported as a Module
+if __name__ == "__main__":
     init()
     gameover = False
 
@@ -19,5 +22,5 @@ def run():
                 pygame.quit
                 quit()
         pygame.display.update()
-run()
+#run()
 
