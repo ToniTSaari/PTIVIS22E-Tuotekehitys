@@ -18,9 +18,21 @@ if __name__ == "__main__":
 
     while gameover != True:
         for events in pygame.event.get():
+            keys = pygame.key.get_pressed()
             if events.type == pygame.QUIT:
                 pygame.quit
                 quit()
+
+            if keys[pygame.K_w]:
+                print("UP")
+            if keys[pygame.K_a]:
+                print("Down")
+            if keys[pygame.K_d]:
+                print("Right")
+            if keys[pygame.K_a]:
+                print("Left")
+        
+        
         pygame.display.update()
 #run()
 
