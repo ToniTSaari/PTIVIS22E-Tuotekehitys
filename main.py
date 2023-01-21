@@ -11,6 +11,10 @@ class Game:
         self.gameover = False
         self.clock = pygame.time.Clock()
         self.framerate = 60
+        self.x = 200
+        self.y = 200
+
+        self.player=pygame.image.load('player.png')
 
     def run(self):
         while not self.gameover:
@@ -39,6 +43,7 @@ class Game:
         pass
 
     def render(self):
+        self.screen.blit(self.player,(self.x,self.y))
         pygame.display.update()
 
 
