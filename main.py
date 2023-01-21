@@ -1,22 +1,25 @@
-# Importaa pygame ja math
 import pygame
 import math
 
-def init():
-    #intialize some specific modules in pygame/ not needed
-    pygame.init()
-    #set static screensize for pygame
-    screen = pygame.display.set_mode((800,600))
-    screen.fill("pink")
 
-#short explanation for __name__==__main__
-#It Allows You to Execute Code When the File Runs as a Script,
-# but Not When It’s Imported as a Module
-if __name__ == "__main__":
-    init()
-    gameover = False
+class Game:
+    def __init__(self):
+        pygame.init()
+        #set static screensize for pygame
+        self.screen = pygame.display.set_mode((800,600))
+        self.screen.fill("pink")
+        self.gameover = False
+        self.clock = pygame.time.Clock()
+        self.framerate = 60
 
-    while gameover != True:
+    def run(self):
+        while not self.gameover:
+            self.clock.tick(self.framerate)
+            self.processInput()
+            self.update()
+            self.render()
+
+    def processInput(self):
         for events in pygame.event.get():
             keys = pygame.key.get_pressed()
             if events.type == pygame.QUIT:
@@ -25,14 +28,21 @@ if __name__ == "__main__":
 
             if keys[pygame.K_w]:
                 print("UP")
-            if keys[pygame.K_a]:
+            if keys[pygame.K_s]:
                 print("Down")
             if keys[pygame.K_d]:
                 print("Right")
             if keys[pygame.K_a]:
                 print("Left")
-        
-        
-        pygame.display.update()
-#run()
 
+    def update(self):
+        pass
+
+    def render(self):
+        pygame.display.update()
+
+
+# runs when executed as a script but not when imported
+if __name__ == "__main__":
+    game = Game()
+    game.run()
