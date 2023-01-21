@@ -31,13 +31,13 @@ class Game:
                 quit()
 
             if keys[pygame.K_w]:
-                print("UP")
+                self.y = self.y - 1
             if keys[pygame.K_s]:
-                print("Down")
+                self.y = self.y + 1
             if keys[pygame.K_d]:
-                print("Right")
+                self.x = self.x + 1
             if keys[pygame.K_a]:
-                print("Left")
+                self.x = self.x - 1
 
     def update(self):
         pass
