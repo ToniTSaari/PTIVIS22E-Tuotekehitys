@@ -1,4 +1,5 @@
 import pygame
+from player import Player
 
 
 class Game:
@@ -13,9 +14,7 @@ class Game:
 
         self.gameover = False
 
-        self.x = 200
-        self.y = 200
-        self.player = pygame.image.load('assets/art/player.png')
+        self.player = Player()
 
     def run(self):
         while not self.gameover:
@@ -32,30 +31,33 @@ class Game:
 
         keys = pygame.key.get_pressed()
 
-        if self.y > 0 and self.y < 800 and self.x > 0 and self.x < 600:
+        if self.player.rect.y > 0 \
+        and self.player.rect.y < 800 \
+        and self.player.rect.x > 0 \
+        and self.player.rect.x < 600:
             if keys[pygame.K_w]:
-                self.y = self.y - 1
-                if self.y == 0:
-                    self.y = 1
+                self.player.rect.y -= 1
+                if self.player.rect.y == 0:
+                    self.player.rect.y = 1
             if keys[pygame.K_s]:
-                self.y = self.y + 1
-                if self.y == 800:
-                    self.y = 799
+                self.player.rect.y += 1
+                if self.player.rect.y == 800:
+                    self.player.rect.y = 799
             if keys[pygame.K_d]:
-                self.x = self.x + 1
-                if self.x == 600:
-                    self.x = 599
+                self.player.rect.x += 1
+                if self.player.rect.x == 600:
+                    self.player.rect.x = 599
             if keys[pygame.K_a]:
-                self.x = self.x - 1
-                if self.x == 0:
-                    self.x = 1                
+                self.player.rect.x -= 1
+                if self.player.rect.x == 0:
+                    self.player.rect.x = 1                
 
     def update(self):
         pass
 
     def render(self):
         self.screen.fill("pink")
-        self.screen.blit(self.player,(self.x,self.y))
+        self.screen.blit(self.player.sprite, self.player.rect)
         pygame.display.update()
 
 
