@@ -46,21 +46,21 @@ class Game:
 
 
     def update(self) -> None:
-        self.player.rect.move_ip(self.player.speed)
+        self.player.move(self.player.speed)
         
-        if self.player.rect.top < 0:
-            self.player.rect.top = 0
-        if self.player.rect.bottom > self.height:
-            self.player.rect.bottom = self.height
-        if self.player.rect.right > self.width:
-            self.player.rect.right = self.width
-        if self.player.rect.left < 0:
-            self.player.rect.left = 0
+        if self.player.top < 0:
+            self.player.top = 0
+        if self.player.bottom > self.height:
+            self.player.bottom = self.height
+        if self.player.right > self.width:
+            self.player.right = self.width
+        if self.player.left < 0:
+            self.player.left = 0
 
 
     def render(self) -> None:
         self.screen.fill("pink")
-        self.screen.blit(self.player.sprite, self.player.rect)
+        self.screen.blit(self.player.sprite, self.player.pos)
         pygame.display.update()
 
 
