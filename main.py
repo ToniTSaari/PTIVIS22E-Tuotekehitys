@@ -6,7 +6,9 @@ class Game:
     def __init__(self):
         pygame.init()
         
-        self.screen = pygame.display.set_mode((800,600))
+        self.width = 800
+        self.height = 600
+        self.screen = pygame.display.set_mode((self.width, self.height))
         self.screen.fill("pink")
 
         self.clock = pygame.time.Clock()
@@ -31,26 +33,22 @@ class Game:
 
         keys = pygame.key.get_pressed()
 
-        if self.player.rect.y > 0 \
-        and self.player.rect.y < 800 \
-        and self.player.rect.x > 0 \
-        and self.player.rect.x < 600:
-            if keys[pygame.K_w]:
-                self.player.rect.y -= 1
-                if self.player.rect.y == 0:
-                    self.player.rect.y = 1
-            if keys[pygame.K_s]:
-                self.player.rect.y += 1
-                if self.player.rect.y == 800:
-                    self.player.rect.y = 799
-            if keys[pygame.K_d]:
-                self.player.rect.x += 1
-                if self.player.rect.x == 600:
-                    self.player.rect.x = 599
-            if keys[pygame.K_a]:
-                self.player.rect.x -= 1
-                if self.player.rect.x == 0:
-                    self.player.rect.x = 1                
+        if keys[pygame.K_w]:
+            self.player.rect.y -= 1
+            if self.player.rect.top < 0:
+                self.player.rect.top = 0
+        if keys[pygame.K_s]:
+            self.player.rect.y += 1
+            if self.player.rect.bottom > self.height:
+                self.player.rect.bottom = self.height
+        if keys[pygame.K_d]:
+            self.player.rect.x += 1
+            if self.player.rect.right > self.width:
+                self.player.rect.right = self.width
+        if keys[pygame.K_a]:
+            self.player.rect.x -= 1
+            if self.player.rect.left < 0:
+                self.player.rect.left = 0
 
     def update(self):
         pass
