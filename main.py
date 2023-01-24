@@ -47,7 +47,9 @@ class Game:
 
     def update(self) -> None:
         self.player.move(self.player.speed)
+        self.clamp_player_to_screen()
         
+    def clamp_player_to_screen(self) -> None:
         if self.player.top < 0:
             self.player.top = 0
         if self.player.bottom > self.height:
