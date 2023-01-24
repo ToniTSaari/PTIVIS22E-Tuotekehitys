@@ -62,7 +62,7 @@ class Game:
 
     def render(self) -> None:
         self.screen.fill("pink")
-        self.screen.blit(self.player.sprite, self.player.pos)
+        self.screen.blit(self.player.sprite, self.player.position)
         pygame.display.update()
 
 

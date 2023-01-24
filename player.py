@@ -33,7 +33,7 @@ class Player:
         self.__y = new
 
     @property
-    def pos(self) -> Vector2:
+    def position(self) -> Vector2:
         return Vector2(self.x, self.y)
 
 
@@ -48,6 +48,7 @@ class Player:
 
     @property
     def left(self) -> float:
+        """The x coordinate of the left side of the player."""
         return self.x
 
     @left.setter
@@ -56,6 +57,7 @@ class Player:
 
     @property
     def right(self) -> float:
+        """The x coordinate of the right side of the player."""
         return self.x + self.width
 
     @right.setter
@@ -64,6 +66,7 @@ class Player:
 
     @property
     def top(self) -> float:
+        """The y coordinate of the top of the player."""
         return self.y
 
     @top.setter
@@ -72,6 +75,7 @@ class Player:
 
     @property
     def bottom(self) -> float:
+        """The y coordinate of the bottom of the player."""
         return self.y + self.height
 
     @bottom.setter
