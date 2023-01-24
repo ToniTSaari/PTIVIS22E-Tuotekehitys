@@ -1,9 +1,10 @@
 import pygame
+
 from player import Player
 
 
 class Game:
-    def __init__(self):
+    def __init__(self) -> None:
         pygame.init()
         
         self.width = 800
@@ -18,14 +19,16 @@ class Game:
 
         self.player = Player()
 
-    def run(self):
+
+    def run(self) -> None:
         while not self.gameover:
             self.clock.tick(self.framerate)
-            self.processInput()
+            self.process_input()
             self.update()
             self.render()
 
-    def processInput(self):
+
+    def process_input(self) -> None:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit
@@ -33,27 +36,32 @@ class Game:
 
         keys = pygame.key.get_pressed()
 
+        self.player.speed.x = self.player.speed.y = 0
+
         if keys[pygame.K_w]:
-            self.player.rect.y -= 1
-            if self.player.rect.top < 0:
-                self.player.rect.top = 0
+            self.player.speed.y -= self.player.speed_multiplier
         if keys[pygame.K_s]:
-            self.player.rect.y += 1
-            if self.player.rect.bottom > self.height:
-                self.player.rect.bottom = self.height
+            self.player.speed.y += self.player.speed_multiplier
         if keys[pygame.K_d]:
-            self.player.rect.x += 1
-            if self.player.rect.right > self.width:
-                self.player.rect.right = self.width
+            self.player.speed.x += self.player.speed_multiplier
         if keys[pygame.K_a]:
-            self.player.rect.x -= 1
-            if self.player.rect.left < 0:
-                self.player.rect.left = 0
+            self.player.speed.x -= self.player.speed_multiplier
 
-    def update(self):
-        pass
 
-    def render(self):
+    def update(self) -> None:
+        self.player.rect.move_ip(self.player.speed)
+        
+        if self.player.rect.top < 0:
+            self.player.rect.top = 0
+        if self.player.rect.bottom > self.height:
+            self.player.rect.bottom = self.height
+        if self.player.rect.right > self.width:
+            self.player.rect.right = self.width
+        if self.player.rect.left < 0:
+            self.player.rect.left = 0
+
+
+    def render(self) -> None:
         self.screen.fill("pink")
         self.screen.blit(self.player.sprite, self.player.rect)
         pygame.display.update()
