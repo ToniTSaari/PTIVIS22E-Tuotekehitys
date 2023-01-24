@@ -1,6 +1,7 @@
 import pygame
 from pygame.locals import *
 
+import keyboard_input
 from player import Player
 
 
@@ -35,16 +36,8 @@ class Game:
 
         keys = pygame.key.get_pressed()
 
-        self.player.speed.x = self.player.speed.y = 0
-
-        if keys[K_w]:
-            self.player.speed.y -= self.player.speed_multiplier
-        if keys[K_s]:
-            self.player.speed.y += self.player.speed_multiplier
-        if keys[K_d]:
-            self.player.speed.x += self.player.speed_multiplier
-        if keys[K_a]:
-            self.player.speed.x -= self.player.speed_multiplier
+        movement_direction = keyboard_input.movement_direction(keys)
+        self.player.speed =  movement_direction * self.player.speed_multiplier
 
 
     def update(self) -> None:
