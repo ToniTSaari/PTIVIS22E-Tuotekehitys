@@ -29,11 +29,16 @@ class Game:
 
 
     def process_input(self) -> None:
+        self.process_events()
+        self.process_keyboard_input()
+
+    def process_events(self) -> None:
         for event in pygame.event.get():
             if event.type == QUIT:
                 pygame.quit()
                 quit()
 
+    def process_keyboard_input(self) -> None:
         keys = pygame.key.get_pressed()
 
         movement_direction = keyboard_input.movement_direction(keys)
