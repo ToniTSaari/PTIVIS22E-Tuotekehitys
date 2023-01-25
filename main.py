@@ -1,5 +1,5 @@
 import pygame
-import math
+vec2 = pygame.math.Vector2
 
 
 class Game:
@@ -11,8 +11,7 @@ class Game:
         self.gameover = False
         self.clock = pygame.time.Clock()
         self.framerate = 60
-        self.x = 200
-        self.y = 200
+        self.pos = vec2(200, 200)
 
         self.player=pygame.image.load('player.png')
 
@@ -25,10 +24,11 @@ class Game:
 
     def processInput(self):
         for events in pygame.event.get():
-            keys = pygame.key.get_pressed()
             if events.type == pygame.QUIT:
                 pygame.quit
                 quit()
+
+            keys = pygame.key.get_pressed()
             if self.y > 0 and self.y < 800 and self.x > 0 and self.x < 600:
                 if keys[pygame.K_w]:
                     self.y = self.y - 1
@@ -51,7 +51,7 @@ class Game:
         pass
 
     def render(self):
-        self.screen.blit(self.player,(self.x,self.y))
+        self.screen.blit(self.player, self.pos)
         pygame.display.update()
 
 
