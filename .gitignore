@@ -5,5 +5,4 @@ VK4Tehtävä
 VK5Tehtävä
 
 # artifakteja joita Python joskus tekee
-__pycache__
-*/__pycache__
+*__pycache__
