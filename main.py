@@ -3,7 +3,6 @@ import json
 from pygame.locals import *
 
 import keyboard_input
-import bounds
 from player import Player
 
 class Game:
