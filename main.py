@@ -44,29 +44,8 @@ class Game:
                 pygame.quit()
                 quit()
 
-<<<<<<< HEAD
-            keys = pygame.key.get_pressed()
-            if self.y > 0 and self.y < 800 and self.x > 0 and self.x < 600:
-                if keys[pygame.K_w]:
-                    self.y = self.y - 1
-                    if self.y == 0:
-                        self.y = 1
-                if keys[pygame.K_s]:
-                    self.y = self.y + 1
-                    if self.y == 800:
-                        self.y = 799
-                if keys[pygame.K_d]:
-                    self.x = self.x + 1
-                    if self.x == 600:
-                        self.x = 599
-                if keys[pygame.K_a]:
-                    self.x = self.x - 1
-                    if self.x == 0:
-                        self.x = 1                
-=======
     def process_keyboard_input(self) -> None:
         keys = pygame.key.get_pressed()
->>>>>>> c7d5343314c602aa31eebbbca261bcf1ddb7a2f4
 
         movement_direction = keyboard_input.movement_direction(keys)
         self.player.speed =  movement_direction * self.player.speed_multiplier
