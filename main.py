@@ -1,16 +1,23 @@
 import pygame
+import json
 from pygame.locals import *
 
 import keyboard_input
+import bounds
 from player import Player
-
 
 class Game:
     def __init__(self) -> None:
         pygame.init()
 
-        self.width = 800
-        self.height = 600
+        with open('settings.json', 'r') as file:
+            data = file.read()
+
+        settings = json.loads(data)
+        display = settings["display"]
+
+        self.width = display["width"]
+        self.height = display["height"]
         self.screen = pygame.display.set_mode((self.width, self.height))
         self.screen.fill("pink")
 
@@ -47,9 +54,9 @@ class Game:
 
     def update(self) -> None:
         self.player.move(self.player.speed)
-        self.clamp_player_to_screen()
+        self.keepBounds()
         
-    def clamp_player_to_screen(self) -> None:
+    def keepBounds(self) -> None:
         if self.player.top < 0:
             self.player.top = 0
         if self.player.bottom > self.height:
