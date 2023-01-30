@@ -1,6 +1,8 @@
-__pycache__/temp.cpython-38.pyc
-modules/__pycache__/temp.cpython-38.pyc
-VK4Tehtävä/
-VK5Tehtävä/
+# jotain meiän projektille ominaista kamaa
 mygame.zip
 mygame2.zip
+VK4Tehtävä
+VK5Tehtävä
+
+# artifakteja joita Python joskus tekee
+*__pycache__
