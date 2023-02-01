@@ -4,9 +4,6 @@ import keyboard_input
 from player import Player
 from bullet import Bullet
 from common import Vector2
-from common import current_time
-from common import last_shot
-from common import bullet_cooldown
 
 class Game:
     def __init__(self) -> None:
