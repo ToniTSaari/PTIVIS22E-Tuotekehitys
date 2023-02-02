@@ -2,6 +2,7 @@ import pygame
 import json
 from pygame.locals import *
 
+from common import Vector2
 import keyboard_input
 from player import Player
 
@@ -14,6 +15,7 @@ class Game:
             data = file.read()
 
         settings = json.loads(data)
+
         display = settings["display"]
 
         self.width = display["width"]
