@@ -7,6 +7,7 @@ from player import Player
 
 class Game:
     def __init__(self) -> None:
+        self.mmenurunning = None
         pygame.init()
 
         with open('settings.json', 'r') as file:
@@ -100,6 +101,7 @@ class Game:
 
     def new(self) -> None:
         self.mmenurunning = True
+        game.main_menu()
 
     def run(self) -> None:
         while True:
