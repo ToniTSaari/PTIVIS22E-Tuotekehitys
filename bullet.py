@@ -26,4 +26,6 @@ class Bullet(pygame.sprite.Sprite):
        
     def update(self) -> None:
             self.rect.x += 10
+            if self.rect.centerx >= 800:
+                self.kill()
             
