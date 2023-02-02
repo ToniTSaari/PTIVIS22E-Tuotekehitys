@@ -148,4 +148,4 @@ class Game:
 # runs when executed as a script but not when imported
 if __name__ == "__main__":
     game = Game()
-    game.run()
+    #game.run()
