@@ -9,7 +9,6 @@ class Game:
     def __init__(self) -> None:
         pygame.init()
 
-
         with open('settings.json', 'r') as file:
             data = file.read()
 
