@@ -98,6 +98,8 @@ class Game:
                     elif quit_button.collidepoint(mouse_pos):
                         return
 
+    def new(self) -> None:
+        self.mmenurunning = True
 
     def run(self) -> None:
         while True:
@@ -148,4 +150,4 @@ class Game:
 # runs when executed as a script but not when imported
 if __name__ == "__main__":
     game = Game()
-    #game.run()
+    game.new()
