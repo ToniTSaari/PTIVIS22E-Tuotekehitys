@@ -22,11 +22,10 @@ class Object(pygame.sprite.Sprite):
         self.__y = 10
         self._layer = 2
 
-        self.__width = 32
-        self.__height = 32
+        self.image = pygame.image.load('assets/art/viha_puu.png').convert_alpha()
+        self.__width = self.image.get_width()
+        self.__height = self.image.get_height()
 
-        self.image = pygame.Surface([self.__width, self.__height])
-        self.image.fill((100,200,100))
 
         # TODO delete if not needed
         self.rect = self.image.get_rect()
