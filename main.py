@@ -207,7 +207,7 @@ class Game:
             self.player.rect.y += round(self.player.speed.y*2)
 
         if keys[pygame.K_SPACE] and self.bullet_isready == True:
-            bullet_a = Bullet(self.player.position.x + 100, self.player.position.y + 70)
+            bullet_a = Bullet(*(self.player.rect.midright))
             self.bullet_group.add(bullet_a)
             self.bullet_isready = False
 
