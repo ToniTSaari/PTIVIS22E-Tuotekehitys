@@ -1,11 +1,15 @@
 import pygame
-import json
 from pygame.locals import *
+import json
 
 from common import Vector2
 import keyboard_input
 from player import Player
 from boss import Boss
+from bullet import Bullet
+from common import Vector2
+import keyboard_input
+from player import Player
 
 class Game:
     def __init__(self) -> None:
@@ -144,6 +148,17 @@ class Game:
         pygame.sprite.Sprite.__init__(self.boss, self.spritegroup)
         # TODO ALL OBJECTS ITERATE TO SPRITE GROUP AND OTHER GROUPS LATER
         pygame.sprite.Sprite.__init__(self.boss, self.collidergroup)
+        
+        self.bullet = Bullet(300, 300)
+
+        self.bullet_group = pygame.sprite.Group()
+        
+        self.current_time = pygame.time.get_ticks()
+
+        self.last_shot = pygame.time.get_ticks()
+
+        self.bullet_cooldown = 0
+        self.bullet_isready = True
 
         self.mmenurunning = True
         game.main_menu()
@@ -167,8 +182,11 @@ class Game:
                 pygame.quit()
                 quit()
 
+
     def process_keyboard_input(self) -> None:
+
         keys = pygame.key.get_pressed()
+
 
         movement_direction = keyboard_input.movement_direction(keys)
         self.player.speed =  movement_direction * self.player.speed_multiplier
@@ -188,12 +206,18 @@ class Game:
             self.player.rect.x += round(self.player.speed.x*2)
             self.player.rect.y += round(self.player.speed.y*2)
 
+        if keys[pygame.K_SPACE] and self.bullet_isready == True:
+            bullet_a = Bullet(self.player.position.x + 100, self.player.position.y + 70)
+            self.bullet_group.add(bullet_a)
+            self.bullet_isready = False
+
 
     def update(self) -> None:
         self.spritegroup.update()
-        #self.playergroup.update()  # Basically resets speed back to 0
-        #self.clamp_player_to_screen()
-        
+        self.bullet_timer()
+           
+            
+
     def keepBounds(self) -> None:
         if self.player.top < 0:
             self.player.top = 0
@@ -219,10 +243,23 @@ class Game:
 
         self.player.setmovestate(self.player.angle)
         self.spritegroup.draw(self.screen)  # Draw all sprites
+        self.bullet_group.draw(self.screen)
 
 
         pygame.display.update()
 
+        pygame.display.update()
+        self.bullet_group.update()
+
+    
+    def bullet_timer(self) ->None:
+        self.bullet_cooldown += 1
+
+        if self.bullet_cooldown >= 15:
+            self.bullet_cooldown = 0
+            self.bullet_isready = True
+        
+  
 
 # runs when executed as a script but not when imported
 if __name__ == "__main__":
