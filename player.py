@@ -1,24 +1,41 @@
 import pygame
 
 from common import Vector2
+from enum import Enum
 
 
-class Player:
+class Player(pygame.sprite.Sprite):
     def __init__(self) -> None:
-        self.sprite = pygame.image.load('assets/art/player.png')
+        pygame.sprite.Sprite.__init__(self)
+
+        self.player_images=[pygame.image.load('assets/art/player_l0.png').convert_alpha(),
+                            pygame.image.load('assets/art/player_u0.png').convert_alpha(),
+                            pygame.image.load('assets/art/player_r0.png').convert_alpha(),
+                            pygame.image.load('assets/art/player_d0.png').convert_alpha()]
+        self.image = self.player_images[0]
+        self.playerstate = Enum ("State",['A','W','D','S','AW','WD','SD','AS',"STILL"])
+
+        self._layer = 3
 
         self.__x = 200
         self.__y = 200
 
-        self.__width = self.sprite.get_width()
-        self.__height = self.sprite.get_height()
+        self.__width = self.image.get_width()
+        self.__height = self.image.get_height()
 
         self.speed = Vector2(0,0)
         self.speed_multiplier = 1
+        
+        self.rect = self.image.get_rect()
+        self.rect.x = self.x
+        self.rect.y = self.y
+
+        self.mask = pygame.mask.from_surface(self.image)
 
     @property
     def x(self) -> float:
         return self.__x
+
 
     @x.setter
     def x(self, new: float) -> None:
@@ -35,6 +52,10 @@ class Player:
     @property
     def position(self) -> Vector2:
         return Vector2(self.x, self.y)
+
+    @property
+    def angle(self) -> float:
+        return Vector2(1,0).angle_to(self.speed)
 
 
     @property
@@ -87,3 +108,51 @@ class Player:
         """Move the player by a given amount in two dimensions."""
         self.__x += speed.x
         self.__y += speed.y
+
+    def setmovestate(self,angle: float,)-> None:
+        if self.speed == [0,0]:
+            self.playerstate=8
+        elif -157.5 >= angle or 157.5 <= angle <= 180:
+            self.playerstate=0
+        elif -112.5 <= angle <= -67.5:
+            self.playerstate=1
+        elif -22.5 <= angle <=0 or 0 < angle <= 22.5:
+            self.playerstate=2
+        elif 67.5 <= angle <= 112.5:
+            self.playerstate=3
+        elif -157.5 < angle < -112.5:
+            self.playerstate=4
+        elif -67.5 < angle < -22.5:
+            self.playerstate=5
+        elif 22.5 < angle < 67.5:
+            self.playerstate=6
+        elif 112.5 < angle < 157.5:
+            self.playerstate=7
+
+        match self.playerstate:
+            case 0:
+                self.image = self.player_images[0]
+            case 1:
+                self.image = self.player_images[1]
+            case 2:
+                self.image = self.player_images[2]
+            case 3:
+                self.image = self.player_images[3]
+            case 4:
+                self.image = self.player_images[0]
+            case 5:
+                self.image = self.player_images[1]
+            case 6:
+                self.image = self.player_images[2]
+            case 7:
+                self.image = self.player_images[3]
+            case 8:
+                self.image = self.player_images[3]
+
+        
+
+    
+
+        
+
+
