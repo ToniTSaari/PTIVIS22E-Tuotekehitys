@@ -5,6 +5,7 @@ from pygame.locals import *
 from common import Vector2
 import keyboard_input
 from player import Player
+from boss import Boss
 
 class Game:
     def __init__(self) -> None:
@@ -27,6 +28,7 @@ class Game:
         self.framerate = 60
 
         self.player = Player()
+        self.boss = Boss()
 
     def main_menu(self) -> None:
         menu_bg_colour = "#202020"
@@ -173,6 +175,7 @@ class Game:
 
     def render(self) -> None:
         self.screen.fill("pink")
+        self.screen.blit(self.boss.sprite, self.boss.position)
         self.screen.blit(self.player.sprite, self.player.position)
         pygame.display.update()
 
