@@ -5,8 +5,9 @@ from enum import Enum
 
 
 class Player(pygame.sprite.Sprite):
+    
     def __init__(self) -> None:
-        pygame.sprite.Sprite.__init__(self)
+        super().__init__()
 
         self.player_images=[pygame.image.load('assets/art/player_l0.png').convert_alpha(),
                             pygame.image.load('assets/art/player_u0.png').convert_alpha(),

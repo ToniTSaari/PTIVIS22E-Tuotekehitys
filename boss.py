@@ -1,4 +1,3 @@
-# USED FOR CAMERA TESTING TREE ECT SOME STUFF
 import pygame
 
 from common import Vector2
@@ -7,27 +6,14 @@ from common import Vector2
 class Boss(pygame.sprite.Sprite):
 
     def __init__(self):
-        """
         super().__init__()
-        
 
-        super() lets you avoid referring to the base class explicitly,
-        which can be nice. But the main advantage comes with multiple
-        inheritance, where all sorts of fun stuff can happen. 
-        See the standard docs on super if you haven't already.
-        
-        """
-        pygame.sprite.Sprite.__init__(self) 
         self.__x = 10
         self.__y = 10
         self._layer = 2
 
         self.image = pygame.image.load('assets/art/vihapuu.png').convert_alpha()
-        self.__width = self.image.get_width()
-        self.__height = self.image.get_height()
 
-
-        # TODO delete if not needed
         self.rect = self.image.get_rect()
         self.rect.x = self.__x
         self.rect.x = self.__y

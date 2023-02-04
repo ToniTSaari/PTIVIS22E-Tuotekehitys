@@ -14,31 +14,44 @@ import settings
 
 class Game:
     def __init__(self) -> None:
+        '''Create a game and set up the window, environment, etc.'''
         pygame.init()
         settings.init()
 
-        self.mmenurunning = None
-        self.gamelooprunning = None
-
-
-        self.width = settings.display["width"]
-        self.height = settings.display["height"]
-        self.screen = pygame.display.set_mode((self.width, self.height))
-
-        # contain all sprites enemies walls player ect for updates layering
-        self.sprite_group = pygame.sprite.LayeredUpdates()
-        self.collider_group = pygame.sprite.LayeredUpdates() 
-        self.enemy_group = pygame.sprite.LayeredUpdates()  # TODO NOT IN USE
-        self.bullet_group = pygame.sprite.Group()
+        self.initialise_display()
 
         self.clock = pygame.time.Clock()
         self.framerate = 60
 
+    def initialise_display(self) -> None:
+        self.width = settings.display["width"]
+        self.height = settings.display["height"]
+        self.screen = pygame.display.set_mode((self.width, self.height))
+
+
+    def start(self) -> None:
+        '''Create any necessary game entities and start the game.'''
+        # sprite groups for conveniently updating and rendering game entities
+        self.all_sprites = pygame.sprite.LayeredUpdates()
+        self.collider_group = pygame.sprite.LayeredUpdates() 
+        self.enemy_group = pygame.sprite.LayeredUpdates()  # TODO NOT IN USE
+        self.bullet_group = pygame.sprite.Group()
+
         self.player = Player()
         self.boss = Boss()
 
-        self.playercollider = pygame.sprite.GroupSingle(self.player)
+        # add the player and boss to the relevant sprite groups
+        self.all_sprites.add(self.player)
+        pygame.sprite.Sprite.__init__(
+            self.boss,
+            (self.all_sprites, self.collider_group)
+        )
+        
+        # set up shooting cooldown tracking
+        self.bullet_cooldown = 0
+        self.bullet_isready = True
 
+        game.main_menu()
 
     def main_menu(self) -> None:
         menu_bg_colour = "#202020"
@@ -62,7 +75,7 @@ class Game:
 
         arial = pygame.font.Font(None, 100)
 
-        while self.mmenurunning:
+        while True:
             mouse_pos = pygame.mouse.get_pos()
 
             self.screen.fill(menu_bg_colour)
@@ -128,38 +141,17 @@ class Game:
 
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if start_button.collidepoint(mouse_pos):
-                        self.mmenurunning = False
-                        game.run()
+                        game.main_loop()
                     elif temp_button.collidepoint(mouse_pos):
-                        self.mmenurunning = False
                         self.height = 600
                         self.width = 800
                         self.screen = pygame.display.set_mode((self.width, self.height))
-                        game.run()
+                        game.main_loop()
                     elif quit_button.collidepoint(mouse_pos):
                         return
 
-    def new(self) -> None:
-        pygame.sprite.Sprite.__init__(self.player, self.sprite_group)
-        pygame.sprite.Sprite.__init__(self.boss, self.sprite_group)
-        # TODO ALL OBJECTS ITERATE TO SPRITE GROUP AND OTHER GROUPS LATER
-        pygame.sprite.Sprite.__init__(self.boss, self.collider_group)
-        
-        self.bullet = Bullet(300, 300)
-        
-        self.current_time = pygame.time.get_ticks()
-
-        self.last_shot = pygame.time.get_ticks()
-
-        self.bullet_cooldown = 0
-        self.bullet_isready = True
-
-        self.mmenurunning = True
-        game.main_menu()
-
-    def run(self) -> None:
-        self.gamelooprunning = True
-        while self.gamelooprunning:
+    def main_loop(self) -> None:
+        while True:
             self.clock.tick(self.framerate)
             self.process_input()
             self.update()
@@ -186,33 +178,36 @@ class Game:
         self.player.speed =  movement_direction * self.player.speed_multiplier
 
         if self.player.speed.x != 0 and self.player.speed.y != 0:
-            # suhde taitaa olla 1.41.. hypotenuusan ja kannan välillä 45 asteessa, ei toimi ykkösellä hajoaa niin pienistä nopeuksista.
+            # suhde taitaa olla 1.41.. hypotenuusan ja kannan välillä 45 asteessa,
+            # ei toimi ykkösellä hajoaa niin pienistä nopeuksista.
             self.player.speed.scale_to_length(2.82)
-            for sprite in self.sprite_group:
+            for sprite in self.all_sprites:
                 sprite.rect.x -= round(self.player.speed.x)
                 sprite.rect.y -= round(self.player.speed.y)
             self.player.rect.x += round(self.player.speed.x)
             self.player.rect.y += round(self.player.speed.y)
         else:
-            for sprite in self.sprite_group:
+            for sprite in self.all_sprites:
                 sprite.rect.x -= round(self.player.speed.x*2)
                 sprite.rect.y -= round(self.player.speed.y*2)
             self.player.rect.x += round(self.player.speed.x*2)
             self.player.rect.y += round(self.player.speed.y*2)
 
-        if keys[pygame.K_SPACE] and self.bullet_isready == True:
-            bullet_a = Bullet(*(self.player.rect.midright))
-            self.bullet_group.add(bullet_a)
+        if keys[pygame.K_SPACE] and self.bullet_isready:
+            pygame.sprite.Sprite.__init__(
+                Bullet(*(self.player.rect.midright)),
+                (self.bullet_group, self.all_sprites)
+            )
             self.bullet_isready = False
 
 
     def update(self) -> None:
-        self.sprite_group.update()
+        self.all_sprites.update()
         self.bullet_timer()
            
             
 
-    def keepBounds(self) -> None:
+    def keep_bounds(self) -> None:
         if self.player.top < 0:
             self.player.top = 0
         if self.player.bottom > self.height:
@@ -224,29 +219,31 @@ class Game:
 
 
     def render(self) -> None:
-        #self.screen.fill("pink")
-
-        #collision
-        if pygame.sprite.spritecollide(self.playercollider.sprite,self.collider_group,False):
-            if pygame.sprite.spritecollide(self.playercollider.sprite,self.collider_group,False,pygame.sprite.collide_mask):
-                self.screen.fill("red")
-            else:
-                self.screen.fill("pink")
-        else: self.screen.fill("pink")
+        # visualise collision by changing the background colour
+        if pygame.sprite.spritecollide( # check rough collision by sprite rects
+            self.player,
+            self.collider_group,
+            False
+        ) \
+        and pygame.sprite.spritecollide( # pixel-perfect check if rects collide
+            self.player,
+            self.collider_group,
+            False,
+            pygame.sprite.collide_mask
+        ):
+            self.screen.fill("red")
+        else:
+            self.screen.fill("pink")
 
 
         self.player.setmovestate(self.player.angle)
-        self.sprite_group.draw(self.screen)  # Draw all sprites
+        self.all_sprites.draw(self.screen)
         self.bullet_group.draw(self.screen)
 
-
         pygame.display.update()
-
-        pygame.display.update()
-        self.bullet_group.update()
 
     
-    def bullet_timer(self) ->None:
+    def bullet_timer(self) -> None:
         self.bullet_cooldown += 1
 
         if self.bullet_cooldown >= 15:
@@ -258,4 +255,4 @@ class Game:
 # runs when executed as a script but not when imported
 if __name__ == "__main__":
     game = Game()
-    game.new()
+    game.start()
