@@ -5,9 +5,14 @@ from enum import Enum
 
 
 class Player(pygame.sprite.Sprite):
-    
-    def __init__(self) -> None:
-        super().__init__()
+
+    def __init__(self, position: Vector2, *groups) -> None:
+        '''
+        Create a player at a given position.
+
+        The player will be created with its centre at `position`.
+        '''
+        super().__init__(groups)
 
         self.player_images=[pygame.image.load('assets/art/player_l0.png').convert_alpha(),
                             pygame.image.load('assets/art/player_u0.png').convert_alpha(),
@@ -18,11 +23,11 @@ class Player(pygame.sprite.Sprite):
 
         self._layer = 3
 
-        self.__x = 200
-        self.__y = 200
-
         self.__width = self.image.get_width()
         self.__height = self.image.get_height()
+
+        self.__x = position.x - self.__width/2
+        self.__y = position.y - self.__height/2
 
         self.speed = Vector2(0,0)
         self.speed_multiplier = 1

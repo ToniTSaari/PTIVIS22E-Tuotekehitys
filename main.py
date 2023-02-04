@@ -37,14 +37,14 @@ class Game:
         self.enemy_group = pygame.sprite.LayeredUpdates()  # TODO NOT IN USE
         self.bullet_group = pygame.sprite.Group()
 
-        self.player = Player()
-        self.boss = Boss()
-
-        # add the player and boss to the relevant sprite groups
-        self.all_sprites.add(self.player)
-        pygame.sprite.Sprite.__init__(
-            self.boss,
+        self.boss = Boss(
+            Vector2(self.width/2, 144),
             (self.all_sprites, self.collider_group)
+        )
+
+        self.player = Player(
+            Vector2(self.screen.get_rect().center),
+            self.all_sprites
         )
         
         # set up shooting cooldown tracking
@@ -194,8 +194,8 @@ class Game:
             self.player.rect.y += round(self.player.speed.y*2)
 
         if keys[pygame.K_SPACE] and self.bullet_isready:
-            pygame.sprite.Sprite.__init__(
-                Bullet(*(self.player.rect.midright)),
+            Bullet(
+                (self.player.rect.midright),
                 (self.bullet_group, self.all_sprites)
             )
             self.bullet_isready = False

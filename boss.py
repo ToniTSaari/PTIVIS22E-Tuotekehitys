@@ -5,20 +5,26 @@ from common import Vector2
 
 class Boss(pygame.sprite.Sprite):
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, position: Vector2, *groups):
+        '''
+        Create a boss at a given position.
 
-        self.__x = 10
-        self.__y = 10
-        self._layer = 2
+        The boss will be created with its centre at `position`.
+        '''
+        super().__init__(groups)
+
 
         self.image = pygame.image.load('assets/art/vihapuu.png').convert_alpha()
 
         self.rect = self.image.get_rect()
+
+        self.__x = position.x - self.rect.width/2
+        self.__y = position.y - self.rect.height/2
         self.rect.x = self.__x
-        self.rect.x = self.__y
+        self.rect.y = self.__y
 
         self.mask = pygame.mask.from_surface(self.image)
+        self._layer = 2
 
     def update(self) -> None:
         pass
