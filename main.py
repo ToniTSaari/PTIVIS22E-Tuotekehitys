@@ -1,6 +1,5 @@
 import pygame
 from pygame.locals import *
-import json
 
 from common import Vector2
 import keyboard_input
@@ -10,30 +9,27 @@ from bullet import Bullet
 from common import Vector2
 import keyboard_input
 from player import Player
+import settings
+
 
 class Game:
     def __init__(self) -> None:
-        self.mmenurunning = None
         pygame.init()
+        settings.init()
 
-        with open('settings.json', 'r') as file:
-            data = file.read()
-
+        self.mmenurunning = None
         self.gamelooprunning = None
 
-        settings = json.loads(data)
 
-        display = settings["display"]
-
-        self.width = display["width"]
-        self.height = display["height"]
+        self.width = settings.display["width"]
+        self.height = settings.display["height"]
         self.screen = pygame.display.set_mode((self.width, self.height))
-        self.screen.fill("pink")
 
         # contain all sprites enemies walls player ect for updates layering
-        self.spritegroup = pygame.sprite.LayeredUpdates()
-        self.collidergroup = pygame.sprite.LayeredUpdates() 
-        self.enemygroup = pygame.sprite.LayeredUpdates()  # TODO NOT IN USE
+        self.sprite_group = pygame.sprite.LayeredUpdates()
+        self.collider_group = pygame.sprite.LayeredUpdates() 
+        self.enemy_group = pygame.sprite.LayeredUpdates()  # TODO NOT IN USE
+        self.bullet_group = pygame.sprite.Group()
 
         self.clock = pygame.time.Clock()
         self.framerate = 60
@@ -144,14 +140,12 @@ class Game:
                         return
 
     def new(self) -> None:
-        pygame.sprite.Sprite.__init__(self.player, self.spritegroup)
-        pygame.sprite.Sprite.__init__(self.boss, self.spritegroup)
+        pygame.sprite.Sprite.__init__(self.player, self.sprite_group)
+        pygame.sprite.Sprite.__init__(self.boss, self.sprite_group)
         # TODO ALL OBJECTS ITERATE TO SPRITE GROUP AND OTHER GROUPS LATER
-        pygame.sprite.Sprite.__init__(self.boss, self.collidergroup)
+        pygame.sprite.Sprite.__init__(self.boss, self.collider_group)
         
         self.bullet = Bullet(300, 300)
-
-        self.bullet_group = pygame.sprite.Group()
         
         self.current_time = pygame.time.get_ticks()
 
@@ -194,13 +188,13 @@ class Game:
         if self.player.speed.x != 0 and self.player.speed.y != 0:
             # suhde taitaa olla 1.41.. hypotenuusan ja kannan välillä 45 asteessa, ei toimi ykkösellä hajoaa niin pienistä nopeuksista.
             self.player.speed.scale_to_length(2.82)
-            for sprite in self.spritegroup:
+            for sprite in self.sprite_group:
                 sprite.rect.x -= round(self.player.speed.x)
                 sprite.rect.y -= round(self.player.speed.y)
             self.player.rect.x += round(self.player.speed.x)
             self.player.rect.y += round(self.player.speed.y)
         else:
-            for sprite in self.spritegroup:
+            for sprite in self.sprite_group:
                 sprite.rect.x -= round(self.player.speed.x*2)
                 sprite.rect.y -= round(self.player.speed.y*2)
             self.player.rect.x += round(self.player.speed.x*2)
@@ -213,7 +207,7 @@ class Game:
 
 
     def update(self) -> None:
-        self.spritegroup.update()
+        self.sprite_group.update()
         self.bullet_timer()
            
             
@@ -233,8 +227,8 @@ class Game:
         #self.screen.fill("pink")
 
         #collision
-        if pygame.sprite.spritecollide(self.playercollider.sprite,self.collidergroup,False):
-            if pygame.sprite.spritecollide(self.playercollider.sprite,self.collidergroup,False,pygame.sprite.collide_mask):
+        if pygame.sprite.spritecollide(self.playercollider.sprite,self.collider_group,False):
+            if pygame.sprite.spritecollide(self.playercollider.sprite,self.collider_group,False,pygame.sprite.collide_mask):
                 self.screen.fill("red")
             else:
                 self.screen.fill("pink")
@@ -242,7 +236,7 @@ class Game:
 
 
         self.player.setmovestate(self.player.angle)
-        self.spritegroup.draw(self.screen)  # Draw all sprites
+        self.sprite_group.draw(self.screen)  # Draw all sprites
         self.bullet_group.draw(self.screen)
 
 
