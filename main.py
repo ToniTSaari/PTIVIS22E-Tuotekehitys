@@ -32,6 +32,14 @@ class Game:
         self.height = settings.display["height"]
         self.screen = pygame.display.set_mode((self.width, self.height))
 
+    def fullscreen_display(self) -> None:
+        self.screen = pygame.display.set_mode((0,0), pygame.FULLSCREEN)
+
+    def change_display(self, w, h) -> None:
+        self.width = w
+        self.height = h
+        self.screen = pygame.display.set_mode((self.width, self.height))
+        game.main_menu()
 
     def start(self) -> None:
         '''Create any necessary game entities and start the game.'''
@@ -58,15 +66,32 @@ class Game:
         self.bullet_cooldown = 0
         self.bullet_isready = True
 
-        game.main_menu1()
+        game.main_menu()
 
-    def main_menu1(self) -> None:
-        menu = pygame_menu.Menu('Menu', settings.display["width"], settings.display["height"], theme=pygame_menu.themes.THEME_BLUE)
+    def main_menu(self) -> None:
+        menu = pygame_menu.Menu('Menu', self.width, self.height, theme=pygame_menu.themes.THEME_BLUE)
+
         menu.add.button('Play', game.main_loop)
+        menu.add.button('Resolution', game.resolution_menu)
         menu.add.button('Quit', pygame_menu.events.EXIT)
+
         menu.mainloop(self.screen)
 
-    def main_menu2(self) -> None:
+    def resolution_menu(self) -> None:
+        resMenu = pygame_menu.Menu('Resolution', self.width, self.height, theme=pygame_menu.themes.THEME_BLUE)
+
+        resolutions = [(800,600),(1280,720)]
+
+        resMenu.add.button('Fullscreen', game.fullscreen_display)
+        resMenu.add.dropselect(
+            'Resolution', [('800:600', 1), ('1280:720', 2)], placeholder='Select Resolution'
+        )
+        resMenu.add.button('Apply', game.main_menu)
+        resMenu.add.button('Cancel', game.main_menu)
+
+        resMenu.mainloop(self.screen)
+
+    def main_menu_obsolete(self) -> None:
         menu_bg_colour = "#202020"
         text_colour = "#202020"
         button_colour = "pink"
