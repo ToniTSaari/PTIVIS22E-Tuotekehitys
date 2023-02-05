@@ -23,6 +23,8 @@ class Boss(pygame.sprite.Sprite):
         self.rect.x = self.__x
         self.rect.y = self.__y
 
+        self.hp = 20
+
         self.mask = pygame.mask.from_surface(self.image)
         self._layer = 2
 
@@ -48,3 +50,6 @@ class Boss(pygame.sprite.Sprite):
     @property
     def position(self) -> Vector2:
         return Vector2(self.x, self.y)
+
+    def take_damage(self, amount: int) -> None:
+        self.hp = max(self.hp - 1, 0)
