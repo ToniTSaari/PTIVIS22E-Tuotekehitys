@@ -40,6 +40,7 @@ class Player(pygame.sprite.Sprite):
 
         self.mask = pygame.mask.from_surface(self.image)
 
+        self.default_shot_cooldown = 15
         self.shot_cooldown = 0
 
     @property
@@ -120,10 +121,10 @@ class Player(pygame.sprite.Sprite):
         self.__tick_shot_cooldown()
 
     def __tick_shot_cooldown(self) -> None:
-        self.shot_cooldown += 1
-
-        if self.shot_cooldown >= 15:
-            self.shot_cooldown = 0
+        if self.shot_cooldown > 0:
+            self.shot_cooldown -= 1
+        else:
+            self.shot_cooldown = self.default_shot_cooldown
 
     def can_shoot(self) -> bool:
         return self.shot_cooldown == 0
