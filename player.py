@@ -30,7 +30,7 @@ class Player(pygame.sprite.Sprite):
         self.__y = position.y - self.__height/2
 
         self.speed = Vector2(0,0)
-        self.speed_multiplier = 1
+        self.speed_multiplier = 5
         
         self.rect = self.image.get_rect()
         self.rect.x = self.x

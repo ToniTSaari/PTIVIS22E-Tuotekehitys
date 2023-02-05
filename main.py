@@ -168,21 +168,11 @@ class Game:
         movement_direction = keyboard_input.movement_direction(keys)
         self.player.speed =  movement_direction * self.player.speed_multiplier
 
-        if self.player.speed.x != 0 and self.player.speed.y != 0:
-            # suhde taitaa olla 1.41.. hypotenuusan ja kannan välillä 45 asteessa,
-            # ei toimi ykkösellä hajoaa niin pienistä nopeuksista.
-            self.player.speed.scale_to_length(2.82)
-            for sprite in self.all_sprites:
-                sprite.rect.x -= round(self.player.speed.x)
-                sprite.rect.y -= round(self.player.speed.y)
-            self.player.rect.x += round(self.player.speed.x)
-            self.player.rect.y += round(self.player.speed.y)
-        else:
-            for sprite in self.all_sprites:
-                sprite.rect.x -= round(self.player.speed.x*2)
-                sprite.rect.y -= round(self.player.speed.y*2)
-            self.player.rect.x += round(self.player.speed.x*2)
-            self.player.rect.y += round(self.player.speed.y*2)
+        for sprite in self.all_sprites:
+            sprite.rect.x -= round(self.player.speed.x)
+            sprite.rect.y -= round(self.player.speed.y)
+        self.player.rect.x += round(self.player.speed.x)
+        self.player.rect.y += round(self.player.speed.y)
 
         if keys[pygame.K_SPACE] and self.player.can_shoot():
             mouse_x, mouse_y = pygame.mouse.get_pos()
