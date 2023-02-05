@@ -17,7 +17,7 @@ import settings
 class Game:
     def __init__(self) -> None:
         '''Create a game and set up the window, environment, etc.'''
-        pygame.mixer.pre_init(44100,16,4,1024)#Frequecy,size,channels,buffer
+        pygame.mixer.pre_init(44100,-16,4,1024)#Frequecy,size,channels,buffer
         pygame.init()
         settings.init()
 
