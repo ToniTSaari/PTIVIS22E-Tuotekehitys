@@ -11,6 +11,7 @@ import keyboard_input
 from player import Player
 from mixer import Mixer
 import settings
+import pygame_menu
 
 
 class Game:
@@ -57,9 +58,15 @@ class Game:
         self.bullet_cooldown = 0
         self.bullet_isready = True
 
-        game.main_menu()
+        game.main_menu1()
 
-    def main_menu(self) -> None:
+    def main_menu1(self) -> None:
+        menu = pygame_menu.Menu('Menu', settings.display["width"], settings.display["height"], theme=pygame_menu.themes.THEME_BLUE)
+        menu.add.button('Play', game.main_loop)
+        menu.add.button('Quit', pygame_menu.events.EXIT)
+        menu.mainloop(self.screen)
+
+    def main_menu2(self) -> None:
         menu_bg_colour = "#202020"
         text_colour = "#202020"
         button_colour = "pink"
