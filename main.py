@@ -162,6 +162,7 @@ class Game:
     def main_loop(self) -> None:
         self.mixer.loadmusic(1)
         self.mixer.playambient()
+        self.mixer.setambientvolume(0.5)
         while True:
             self.clock.tick(self.framerate)
             self.process_input()
@@ -205,6 +206,7 @@ class Game:
             self.player.rect.y += round(self.player.speed.y*2)
 
         if keys[pygame.K_SPACE] and self.bullet_isready:
+            self.mixer.playsfx(0)
             Bullet(
                 (self.player.rect.midright),
                 (self.bullet_group, self.all_sprites)
