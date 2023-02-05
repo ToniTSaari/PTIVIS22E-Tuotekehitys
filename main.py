@@ -9,12 +9,14 @@ from bullet import Bullet
 from common import Vector2
 import keyboard_input
 from player import Player
+from mixer import Mixer
 import settings
 
 
 class Game:
     def __init__(self) -> None:
         '''Create a game and set up the window, environment, etc.'''
+        pygame.mixer.pre_init(44100,16,4,1024)#Frequecy,size,channels,buffer
         pygame.init()
         settings.init()
 
@@ -22,6 +24,7 @@ class Game:
 
         self.clock = pygame.time.Clock()
         self.framerate = 60
+
 
     def initialise_display(self) -> None:
         self.width = settings.display["width"]
@@ -46,6 +49,9 @@ class Game:
             Vector2(self.screen.get_rect().center),
             self.all_sprites
         )
+
+        self.mixer = Mixer()
+
         
         # set up shooting cooldown tracking
         self.bullet_cooldown = 0
@@ -74,6 +80,9 @@ class Game:
         quit_button = Rect(button_x, q_button_y, button_w, button_h)
 
         arial = pygame.font.Font(None, 100)
+
+        self.mixer.loadmusic(0)
+        self.mixer.playambient()
 
         while True:
             mouse_pos = pygame.mouse.get_pos()
@@ -151,6 +160,8 @@ class Game:
                         return
 
     def main_loop(self) -> None:
+        self.mixer.loadmusic(1)
+        self.mixer.playambient()
         while True:
             self.clock.tick(self.framerate)
             self.process_input()

@@ -16,6 +16,7 @@ import json
 
 all = None
 display = None
+ambientm = None
 
 def init() -> None:
     '''
@@ -28,7 +29,8 @@ def init() -> None:
     Raises an exception if settings.json cannot be read for any reason.
     '''
     with open('settings.json', 'r') as file:
-        global all, display
+        global all, display, ambientm
         data = file.read()
         all = json.loads(data)
         display = all["display"]
+        ambientm = all["ambientm"]
