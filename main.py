@@ -1,6 +1,8 @@
+from math import sin, cos
 import pygame
 from pygame import sprite
 from pygame.locals import *
+import random
 
 from common import Vector2
 import keyboard_input
@@ -188,7 +190,7 @@ class Game:
             self.mixer.playsfx(0)
             Bullet(
                 mouseposvec,
-                (self.player.rect.center),
+                self.player.rect.center,
                 (self.player_bullets, self.all_sprites),
             )
 
@@ -196,10 +198,30 @@ class Game:
     def update(self) -> None:
         self.all_sprites.update()
 
+        self.boss_attack()
+
         self.check_bullet_hits(self.boss, self.player_bullets)
         self.check_bullet_hits(self.player, self.enemy_bullets)
 
         self.check_game_over()
+
+    def boss_attack(self) -> None:
+        if self.boss.can_shoot():
+            bullets_per_shot = 13
+            shot_angle = 360 / bullets_per_shot
+            starting_angle = random.uniform(0, shot_angle)
+            base_vector = Vector2(cos(starting_angle), sin(starting_angle))
+            vectors = [
+                base_vector.rotate(shot_angle * i) + self.boss.rect.center
+                for i in range(bullets_per_shot)
+            ]
+            for v in vectors:
+                Bullet(
+                    v,
+                    self.boss.rect.center,
+                    (self.enemy_bullets, self.all_sprites),
+                )
+
            
     def check_bullet_hits(
         self,
