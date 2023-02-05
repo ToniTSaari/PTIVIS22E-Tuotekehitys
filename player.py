@@ -36,6 +36,8 @@ class Player(pygame.sprite.Sprite):
         self.rect.x = self.x
         self.rect.y = self.y
 
+        self.hp = 3
+
         self.mask = pygame.mask.from_surface(self.image)
 
     @property
@@ -108,6 +110,9 @@ class Player(pygame.sprite.Sprite):
     @bottom.setter
     def bottom(self, new: float) -> None:
         self.y = new - self.height
+
+    def take_damage(self, amount: int) -> None:
+        self.hp = max(self.hp - 1, 0)
 
 
     def move(self, speed: Vector2) -> None:
