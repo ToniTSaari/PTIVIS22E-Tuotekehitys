@@ -208,10 +208,13 @@ class Game:
             self.player.rect.y += round(self.player.speed.y*2)
 
         if keys[pygame.K_SPACE] and self.bullet_isready:
+            mouse_x, mouse_y = pygame.mouse.get_pos()
+            mouseposvec=Vector2(mouse_x,mouse_y)
             self.mixer.playsfx(0)
             Bullet(
+                mouseposvec,
                 (self.player.rect.midright),
-                (self.player_bullets, self.all_sprites)
+                (self.player_bullets, self.all_sprites),
             )
             self.bullet_isready = False
 
