@@ -39,7 +39,6 @@ class Game:
         self.width = wh[0]
         self.height = wh[1]
         self.screen = pygame.display.set_mode((self.width, self.height))
-        game.main_menu()
 
     def start(self) -> None:
         '''Create any necessary game entities and start the game.'''
@@ -72,25 +71,21 @@ class Game:
         menu = pygame_menu.Menu('Menu', self.width, self.height, theme=pygame_menu.themes.THEME_BLUE)
 
         menu.add.button('Play', game.main_loop)
-        menu.add.button('Resolution', game.resolution_menu)
+        menu.add.button('Settings', game.settings_menu)
         menu.add.button('Quit', pygame_menu.events.EXIT)
 
         menu.mainloop(self.screen)
 
-    def resolution_menu(self):
+    def settings_menu(self):
 
-        resMenu = pygame_menu.Menu('Resolution', self.width, self.height, theme=pygame_menu.themes.THEME_BLUE)
+        setMenu = pygame_menu.Menu('Settings', self.width, self.height, theme=pygame_menu.themes.THEME_BLUE)
 
-        resMenu.add.button('Fullscreen', game.fullscreen_display)
-        resMenu.add.dropselect(
-            'Resolution', 
-            [('800:600', [800,600]), ('1280:720', [1280,720])], 
-            placeholder='Select Resolution',
-            dropselect_id='resolution'
-        )
-        resMenu.add.button('Back', game.main_menu)
+        setMenu.add.button('Fullscreen', game.fullscreen_display)
+        setMenu.add.button('800:600', game.change_display([800,600]))
+        setMenu.add.button('1280:720', game.change_display([1280,720]))
+        setMenu.add.button('Back', game.main_menu)
 
-        resMenu.mainloop(self.screen)
+        setMenu.mainloop(self.screen)
        
 
     def main_menu_obsolete(self) -> None:
