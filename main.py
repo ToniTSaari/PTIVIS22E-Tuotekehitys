@@ -220,6 +220,7 @@ class Game:
         self.all_sprites.update()
         self.check_bullet_hits(self.boss, self.player_bullets)
         self.check_bullet_hits(self.player, self.enemy_bullets)
+        self.check_game_over()
         self.bullet_timer()
            
     def check_bullet_hits(
@@ -246,7 +247,41 @@ class Game:
             ):
                 target.take_damage(1)
 
-            
+    def check_game_over(self) -> None:
+        if self.boss.hp == 0:
+            self.game_over_win()
+        elif self.player.hp == 0:
+            self.game_over_lose()
+
+
+    def game_over_win(self) -> None:
+        self.screen.fill("green")
+        self.screen.blit(*(self.make_end_text("VICTORY")))
+        pygame.display.update()
+        self.press_any_button_to_quit()
+    
+    def game_over_lose(self) -> None:
+        self.screen.fill("red")
+        self.screen.blit(*(self.make_end_text("DEFEAT")))
+        pygame.display.update()
+        self.press_any_button_to_quit()
+    
+    
+    def make_end_text(self, text: str):
+        font = pygame.font.Font(None, 350)
+        text_colour = "#202020"
+        text_image = font.render(text, True, text_colour)
+        text_rect = text_image.get_rect()
+        text_rect.center = self.screen.get_rect().center
+
+        return (text_image, text_rect.topleft)
+
+    def press_any_button_to_quit(self) -> None:
+        while True:
+            for event in pygame.event.get():
+                if event.type in [QUIT, MOUSEBUTTONDOWN, KEYDOWN]:
+                    quit()
+        
 
     def keep_bounds(self) -> None:
         if self.player.top < 0:
