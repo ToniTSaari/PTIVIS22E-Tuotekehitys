@@ -1,4 +1,5 @@
 import pygame
+from pygame import sprite
 from pygame.locals import *
 
 from common import Vector2
@@ -35,10 +36,11 @@ class Game:
     def start(self) -> None:
         '''Create any necessary game entities and start the game.'''
         # sprite groups for conveniently updating and rendering game entities
-        self.all_sprites = pygame.sprite.LayeredUpdates()
-        self.collider_group = pygame.sprite.LayeredUpdates() 
-        self.enemy_group = pygame.sprite.LayeredUpdates()  # TODO NOT IN USE
-        self.bullet_group = pygame.sprite.Group()
+        self.all_sprites = sprite.LayeredUpdates()
+        self.collider_group = sprite.LayeredUpdates() 
+        self.enemy_group = sprite.LayeredUpdates()  # TODO NOT IN USE
+        self.player_bullets = sprite.Group()
+        self.enemy_bullets = sprite.Group()
 
         self.boss = Boss(
             Vector2(self.width/2, 144),
@@ -209,15 +211,41 @@ class Game:
             self.mixer.playsfx(0)
             Bullet(
                 (self.player.rect.midright),
-                (self.bullet_group, self.all_sprites)
+                (self.player_bullets, self.all_sprites)
             )
             self.bullet_isready = False
 
 
     def update(self) -> None:
         self.all_sprites.update()
+        self.check_bullet_hits(self.boss, self.player_bullets)
+        self.check_bullet_hits(self.player, self.enemy_bullets)
         self.bullet_timer()
            
+    def check_bullet_hits(
+        self,
+        target: sprite.Sprite,
+        bullet_group: sprite.AbstractGroup
+    ) -> None:
+        '''
+        Check if any bullets in `bullet_group` hit `target`.
+        
+        The target takes 1 damage for every bullet that hits it
+        (must have a method called `take_damage()` that receives an int)
+        and any bullets that hit the target are removed.
+        '''
+        if sprite.spritecollideany(
+            target,
+            bullet_group
+        ):
+            for _ in sprite.spritecollide(
+                target,
+                bullet_group,
+                True,
+                sprite.collide_mask
+            ):
+                target.take_damage(1)
+
             
 
     def keep_bounds(self) -> None:
@@ -233,16 +261,16 @@ class Game:
 
     def render(self) -> None:
         # visualise collision by changing the background colour
-        if pygame.sprite.spritecollide( # check rough collision by sprite rects
+        if sprite.spritecollide( # check rough collision by sprite rects
             self.player,
             self.collider_group,
             False
         ) \
-        and pygame.sprite.spritecollide( # pixel-perfect check if rects collide
+        and sprite.spritecollide( # pixel-perfect check, only if rects collide
             self.player,
             self.collider_group,
             False,
-            pygame.sprite.collide_mask
+            sprite.collide_mask
         ):
             self.screen.fill("red")
         else:
@@ -251,7 +279,7 @@ class Game:
 
         self.player.setmovestate(self.player.angle)
         self.all_sprites.draw(self.screen)
-        self.bullet_group.draw(self.screen)
+        self.player_bullets.draw(self.screen)
 
         pygame.display.update()
 
