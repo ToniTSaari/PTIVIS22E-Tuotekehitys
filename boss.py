@@ -1,4 +1,6 @@
 import pygame
+from bullet import Bullet
+from patterns import Patterns
 
 from common import Vector2
 
@@ -24,6 +26,8 @@ class Boss(pygame.sprite.Sprite):
         self.rect.y = self.__y
 
         self.hp = 20
+
+        self.patterns = Patterns()
 
         self.mask = pygame.mask.from_surface(self.image)
         self._layer = 2
@@ -53,3 +57,7 @@ class Boss(pygame.sprite.Sprite):
 
     def take_damage(self, amount: int) -> None:
         self.hp = max(self.hp - 1, 0)
+
+    def shoot(self) -> None:
+        print(self.patterns.roundpattern())
+        

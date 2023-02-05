@@ -140,6 +140,8 @@ class Game:
                         return
 
     def main_loop(self) -> None:
+        #TEST TODO: PATTERNS
+        self.boss.shoot()
         self.mixer.loadmusic(1)
         self.mixer.playambient()
         self.mixer.setambientvolume(0.5)
