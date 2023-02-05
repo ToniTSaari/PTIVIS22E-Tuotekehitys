@@ -1,32 +1,63 @@
 import pygame
-import json
 from pygame.locals import *
 
 from common import Vector2
 import keyboard_input
 from player import Player
+from boss import Boss
+from bullet import Bullet
+from common import Vector2
+import keyboard_input
+from player import Player
+from mixer import Mixer
+import settings
+
 
 class Game:
     def __init__(self) -> None:
-        self.mmenurunning = None
+        '''Create a game and set up the window, environment, etc.'''
+        pygame.mixer.pre_init(44100,16,4,1024)#Frequecy,size,channels,buffer
         pygame.init()
+        settings.init()
 
-        with open('settings.json', 'r') as file:
-            data = file.read()
-
-        settings = json.loads(data)
-
-        display = settings["display"]
-
-        self.width = display["width"]
-        self.height = display["height"]
-        self.screen = pygame.display.set_mode((self.width, self.height))
-        self.screen.fill("pink")
+        self.initialise_display()
 
         self.clock = pygame.time.Clock()
         self.framerate = 60
 
-        self.player = Player()
+
+    def initialise_display(self) -> None:
+        self.width = settings.display["width"]
+        self.height = settings.display["height"]
+        self.screen = pygame.display.set_mode((self.width, self.height))
+
+
+    def start(self) -> None:
+        '''Create any necessary game entities and start the game.'''
+        # sprite groups for conveniently updating and rendering game entities
+        self.all_sprites = pygame.sprite.LayeredUpdates()
+        self.collider_group = pygame.sprite.LayeredUpdates() 
+        self.enemy_group = pygame.sprite.LayeredUpdates()  # TODO NOT IN USE
+        self.bullet_group = pygame.sprite.Group()
+
+        self.boss = Boss(
+            Vector2(self.width/2, 144),
+            (self.all_sprites, self.collider_group)
+        )
+
+        self.player = Player(
+            Vector2(self.screen.get_rect().center),
+            self.all_sprites
+        )
+
+        self.mixer = Mixer()
+
+        
+        # set up shooting cooldown tracking
+        self.bullet_cooldown = 0
+        self.bullet_isready = True
+
+        game.main_menu()
 
     def main_menu(self) -> None:
         menu_bg_colour = "#202020"
@@ -50,7 +81,10 @@ class Game:
 
         arial = pygame.font.Font(None, 100)
 
-        while self.mmenurunning:
+        self.mixer.loadmusic(0)
+        self.mixer.playambient()
+
+        while True:
             mouse_pos = pygame.mouse.get_pos()
 
             self.screen.fill(menu_bg_colour)
@@ -116,22 +150,18 @@ class Game:
 
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if start_button.collidepoint(mouse_pos):
-                        self.mmenurunning = False
-                        game.run()
+                        game.main_loop()
                     elif temp_button.collidepoint(mouse_pos):
-                        self.mmenurunning = False
                         self.height = 600
                         self.width = 800
                         self.screen = pygame.display.set_mode((self.width, self.height))
-                        game.run()
+                        game.main_loop()
                     elif quit_button.collidepoint(mouse_pos):
                         return
 
-    def new(self) -> None:
-        self.mmenurunning = True
-        game.main_menu()
-
-    def run(self) -> None:
+    def main_loop(self) -> None:
+        self.mixer.loadmusic(1)
+        self.mixer.playambient()
         while True:
             self.clock.tick(self.framerate)
             self.process_input()
@@ -149,18 +179,46 @@ class Game:
                 pygame.quit()
                 quit()
 
+
     def process_keyboard_input(self) -> None:
+
         keys = pygame.key.get_pressed()
+
 
         movement_direction = keyboard_input.movement_direction(keys)
         self.player.speed =  movement_direction * self.player.speed_multiplier
 
+        if self.player.speed.x != 0 and self.player.speed.y != 0:
+            # suhde taitaa olla 1.41.. hypotenuusan ja kannan välillä 45 asteessa,
+            # ei toimi ykkösellä hajoaa niin pienistä nopeuksista.
+            self.player.speed.scale_to_length(2.82)
+            for sprite in self.all_sprites:
+                sprite.rect.x -= round(self.player.speed.x)
+                sprite.rect.y -= round(self.player.speed.y)
+            self.player.rect.x += round(self.player.speed.x)
+            self.player.rect.y += round(self.player.speed.y)
+        else:
+            for sprite in self.all_sprites:
+                sprite.rect.x -= round(self.player.speed.x*2)
+                sprite.rect.y -= round(self.player.speed.y*2)
+            self.player.rect.x += round(self.player.speed.x*2)
+            self.player.rect.y += round(self.player.speed.y*2)
+
+        if keys[pygame.K_SPACE] and self.bullet_isready:
+            Bullet(
+                (self.player.rect.midright),
+                (self.bullet_group, self.all_sprites)
+            )
+            self.bullet_isready = False
+
 
     def update(self) -> None:
-        self.player.move(self.player.speed)
-        self.keepBounds()
-        
-    def keepBounds(self) -> None:
+        self.all_sprites.update()
+        self.bullet_timer()
+           
+            
+
+    def keep_bounds(self) -> None:
         if self.player.top < 0:
             self.player.top = 0
         if self.player.bottom > self.height:
@@ -172,12 +230,40 @@ class Game:
 
 
     def render(self) -> None:
-        self.screen.fill("pink")
-        self.screen.blit(self.player.sprite, self.player.position)
+        # visualise collision by changing the background colour
+        if pygame.sprite.spritecollide( # check rough collision by sprite rects
+            self.player,
+            self.collider_group,
+            False
+        ) \
+        and pygame.sprite.spritecollide( # pixel-perfect check if rects collide
+            self.player,
+            self.collider_group,
+            False,
+            pygame.sprite.collide_mask
+        ):
+            self.screen.fill("red")
+        else:
+            self.screen.fill("pink")
+
+
+        self.player.setmovestate(self.player.angle)
+        self.all_sprites.draw(self.screen)
+        self.bullet_group.draw(self.screen)
+
         pygame.display.update()
 
+    
+    def bullet_timer(self) -> None:
+        self.bullet_cooldown += 1
+
+        if self.bullet_cooldown >= 15:
+            self.bullet_cooldown = 0
+            self.bullet_isready = True
+        
+  
 
 # runs when executed as a script but not when imported
 if __name__ == "__main__":
     game = Game()
-    game.new()
+    game.start()
