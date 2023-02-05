@@ -191,7 +191,7 @@ class Game:
             self.mixer.playsfx(0)
             Bullet(
                 mouseposvec,
-                (self.player.rect.midright),
+                (self.player.rect.center),
                 (self.player_bullets, self.all_sprites),
             )
             self.bullet_isready = False
