@@ -40,6 +40,8 @@ class Player(pygame.sprite.Sprite):
 
         self.mask = pygame.mask.from_surface(self.image)
 
+        self.shot_cooldown = 0
+
     @property
     def x(self) -> float:
         return self.__x
@@ -113,6 +115,18 @@ class Player(pygame.sprite.Sprite):
 
     def take_damage(self, amount: int) -> None:
         self.hp = max(self.hp - 1, 0)
+
+    def update(self) -> None:
+        self.__tick_shot_cooldown()
+
+    def __tick_shot_cooldown(self) -> None:
+        self.shot_cooldown += 1
+
+        if self.shot_cooldown >= 15:
+            self.shot_cooldown = 0
+
+    def can_shoot(self) -> bool:
+        return self.shot_cooldown == 0
 
 
     def move(self, speed: Vector2) -> None:
