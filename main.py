@@ -295,22 +295,7 @@ class Game:
 
 
     def render(self) -> None:
-        # visualise collision by changing the background colour
-        if sprite.spritecollide( # check rough collision by sprite rects
-            self.player,
-            self.collider_group,
-            False
-        ) \
-        and sprite.spritecollide( # pixel-perfect check, only if rects collide
-            self.player,
-            self.collider_group,
-            False,
-            sprite.collide_mask
-        ):
-            self.screen.fill("red")
-        else:
-            self.screen.fill("pink")
-
+        self.screen.fill("pink")
 
         self.player.setmovestate(self.player.angle)
         self.all_sprites.draw(self.screen)
