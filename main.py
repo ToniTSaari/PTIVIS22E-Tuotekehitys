@@ -92,15 +92,10 @@ class Game:
             self.screen.fill(menu_bg_colour)
 
             start_text = arial.render("Start", True, text_colour)
-            temp_text = arial.render("temp", True, text_colour)
             quit_text = arial.render("Quit", True, text_colour)
 
             start_button_colour = \
                 start_highlight if start_button.collidepoint(mouse_pos) \
-                    else button_colour
-
-            temp_button_colour = \
-                temp_highlight if temp_button.collidepoint(mouse_pos) \
                     else button_colour
             
             quit_button_colour = \
@@ -111,13 +106,6 @@ class Game:
                 self.screen,
                 start_button_colour,
                 start_button,
-                border_radius=10
-            )
-
-            pygame.draw.rect(
-                self.screen,
-                temp_button_colour,
-                temp_button,
                 border_radius=10
             )
 
@@ -134,11 +122,6 @@ class Game:
             )
 
             self.screen.blit(
-                temp_text,
-                Vector2(temp_button.center) - temp_text.get_rect().center
-            )
-
-            self.screen.blit(
                 quit_text,
                 Vector2(quit_button.center) - quit_text.get_rect().center
             )
@@ -152,11 +135,6 @@ class Game:
 
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if start_button.collidepoint(mouse_pos):
-                        game.main_loop()
-                    elif temp_button.collidepoint(mouse_pos):
-                        self.height = 600
-                        self.width = 800
-                        self.screen = pygame.display.set_mode((self.width, self.height))
                         game.main_loop()
                     elif quit_button.collidepoint(mouse_pos):
                         return
