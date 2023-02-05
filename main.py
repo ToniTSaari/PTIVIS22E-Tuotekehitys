@@ -267,6 +267,8 @@ class Game:
         return (text_image, text_rect.topleft)
 
     def press_any_button_to_quit(self) -> None:
+        pygame.time.wait(2000) # wait 2 seconds to avoid accidents
+        pygame.event.get() # clear the event queue for the same reason
         while True:
             for event in pygame.event.get():
                 if event.type in [QUIT, MOUSEBUTTONDOWN, KEYDOWN]:
