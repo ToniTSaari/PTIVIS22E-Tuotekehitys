@@ -79,13 +79,16 @@ class Game:
         button_w = 250
         button_h = 100
         button_x = self.width/2 - button_w/2
+        y_ratio = self.height / 5
 
-        s_button_y = (self.height - button_h) / 4
-        q_button_y = self.height - (s_button_y + button_h)
-        t_button_y = self.height - (((s_button_y + q_button_y) / 2) + button_h)
+        s_button_y = y_ratio * 1
+        small_button_y = y_ratio * 2
+        big_button_y = y_ratio * 3
+        q_button_y = y_ratio * 4
 
         start_button = Rect(button_x, s_button_y, button_w, button_h)
-        temp_button = Rect(button_x, t_button_y, button_w, button_h)
+        small_button = Rect(button_x, small_button_y, button_w, button_h)
+        big_button = Rect(button_x, big_button_y, button_w, button_h)
         quit_button = Rect(button_x, q_button_y, button_w, button_h)
 
         arial = pygame.font.Font(None, 100)
@@ -99,7 +102,8 @@ class Game:
             self.screen.fill(menu_bg_colour)
 
             start_text = arial.render("Start", True, text_colour)
-            temp_text = arial.render("temp", True, text_colour)
+            big_text = arial.render("1280:720", True, text_colour)
+            small_text = arial.render("800:600", True, text_colour)
             quit_text = arial.render("Quit", True, text_colour)
 
             start_button_colour = \
@@ -107,7 +111,7 @@ class Game:
                     else button_colour
 
             temp_button_colour = \
-                temp_highlight if temp_button.collidepoint(mouse_pos) \
+                temp_highlight if big_button.collidepoint(mouse_pos) \
                     else button_colour
             
             quit_button_colour = \
@@ -124,7 +128,14 @@ class Game:
             pygame.draw.rect(
                 self.screen,
                 temp_button_colour,
-                temp_button,
+                big_button,
+                border_radius=10
+            )
+
+            pygame.draw.rect(
+                self.screen,
+                temp_button_colour,
+                small_button,
                 border_radius=10
             )
 
@@ -141,8 +152,13 @@ class Game:
             )
 
             self.screen.blit(
-                temp_text,
-                Vector2(temp_button.center) - temp_text.get_rect().center
+                big_text,
+                Vector2(big_button.center) - big_text.get_rect().center
+            )
+
+            self.screen.blit(
+                small_text,
+                Vector2(small_button.center) - small_text.get_rect().center
             )
 
             self.screen.blit(
@@ -160,13 +176,14 @@ class Game:
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if start_button.collidepoint(mouse_pos):
                         game.main_loop()
-                    elif temp_button.collidepoint(mouse_pos):
-                        if self.height == 720:
-                            self.height = 600
-                            self.width = 800
-                        elif self.height == 600:
-                            self.height = 720
-                            self.width = 1280
+                    elif big_button.collidepoint(mouse_pos):
+                        self.height = 720
+                        self.width = 1280
+                        self.screen = pygame.display.set_mode((self.width, self.height))
+                        game.main_menu()
+                    elif small_button.collidepoint(mouse_pos):
+                        self.height = 600
+                        self.width = 800
                         self.screen = pygame.display.set_mode((self.width, self.height))
                         game.main_menu()
                     elif quit_button.collidepoint(mouse_pos):
