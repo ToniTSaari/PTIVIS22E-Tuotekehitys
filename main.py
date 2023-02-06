@@ -82,10 +82,10 @@ class Game:
 
         setMenu = pygame_menu.Menu('Settings', self.width, self.height, theme=pygame_menu.themes.THEME_BLUE)
 
-        setMenu.add.button('Fullscreen', game.fullscreen_display)
-        setMenu.add.button('800:600', game.change_display([800,600]))
-        setMenu.add.button('1280:720', game.change_display([1280,720]))
-        setMenu.add.button('Back', game.main_menu)
+        setMenu.add.button('Fullscreen', game.fullscreen_display(), 0)
+        setMenu.add.button('800:600', game.change_display([800,600]), 1)
+        setMenu.add.button('1280:720', game.change_display([1280,720]), 2)
+        setMenu.add.button('Back', game.main_menu(), 3)
 
         setMenu.mainloop(self.screen)
        
