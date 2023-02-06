@@ -76,7 +76,7 @@ class Game:
         temp_highlight = "blue"
         quit_highlight = "red"
 
-        button_w = 250
+        button_w = 320
         button_h = 100
         button_x = self.width/2 - button_w/2
         y_ratio = self.height / 5
@@ -110,8 +110,12 @@ class Game:
                 start_highlight if start_button.collidepoint(mouse_pos) \
                     else button_colour
 
-            temp_button_colour = \
+            big_button_colour = \
                 temp_highlight if big_button.collidepoint(mouse_pos) \
+                    else button_colour
+            
+            small_button_colour = \
+                temp_highlight if small_button.collidepoint(mouse_pos) \
                     else button_colour
             
             quit_button_colour = \
@@ -127,14 +131,14 @@ class Game:
 
             pygame.draw.rect(
                 self.screen,
-                temp_button_colour,
+                big_button_colour,
                 big_button,
                 border_radius=10
             )
 
             pygame.draw.rect(
                 self.screen,
-                temp_button_colour,
+                small_button_colour,
                 small_button,
                 border_radius=10
             )
@@ -180,11 +184,21 @@ class Game:
                         self.height = 720
                         self.width = 1280
                         self.screen = pygame.display.set_mode((self.width, self.height))
+                        display = settings.all["display"]
+                        display["height"] = self.height
+                        display["width"] = self.width
+                        settings.all["display"] = display
+                        settings.write(settings.all)
                         game.main_menu()
                     elif small_button.collidepoint(mouse_pos):
                         self.height = 600
                         self.width = 800
                         self.screen = pygame.display.set_mode((self.width, self.height))
+                        display = settings.all["display"]
+                        display["height"] = self.height
+                        display["width"] = self.width
+                        settings.all["display"] = display
+                        settings.write(settings.all)
                         game.main_menu()
                     elif quit_button.collidepoint(mouse_pos):
                         pygame.quit()

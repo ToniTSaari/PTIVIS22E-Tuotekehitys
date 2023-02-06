@@ -36,3 +36,8 @@ def init() -> None:
         display = all["display"]
         ambientm = all["ambientm"]
         sfxm = all["sfxm"]
+
+def write(data) -> None:
+    with open('settings.json', 'w') as file:
+        save = json.dumps(data, indent=4)
+        file.write(save)
