@@ -161,12 +161,16 @@ class Game:
                     if start_button.collidepoint(mouse_pos):
                         game.main_loop()
                     elif temp_button.collidepoint(mouse_pos):
-                        self.height = 600
-                        self.width = 800
+                        if self.height == 720:
+                            self.height = 600
+                            self.width = 800
+                        elif self.height == 600:
+                            self.height = 720
+                            self.width = 1280
                         self.screen = pygame.display.set_mode((self.width, self.height))
-                        game.main_loop()
+                        game.main_menu()
                     elif quit_button.collidepoint(mouse_pos):
-                        return
+                        pygame.quit()
 
     def main_loop(self) -> None:
         self.mixer.loadmusic(1)
