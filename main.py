@@ -4,6 +4,7 @@ from pygame import sprite
 from pygame.locals import *
 import random
 
+import canvas
 from common import Vector2
 import keyboard_input
 from player import Player
@@ -52,6 +53,12 @@ class Game:
         self.player = Player(
             Vector2(self.screen.get_rect().center),
             self.all_sprites
+        )
+
+        # draw everything on the canvas, then draw a part of it on the screen
+        self.canvas = canvas.from_image(
+            pygame.image.load("assets/art/bg/woods.jpg"),
+            self.player
         )
 
         self.mixer = Mixer()
@@ -289,7 +296,9 @@ class Game:
         self.screen.fill("pink")
 
         self.player.setmovestate(self.player.angle)
-        self.all_sprites.draw(self.screen)
+
+        self.canvas.draw(self.all_sprites)
+        self.screen.blit(self.canvas.camera_view(), (0,0))
 
         pygame.display.update()
         
