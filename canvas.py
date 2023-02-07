@@ -42,6 +42,11 @@ class Canvas:
 
         self.__camera = camera
 
+    @property
+    def inner(self) -> Surface:
+        """The surface representing the canvas."""
+        return self.__canvas
+
     def draw(
         self,
         sprites: Group,
@@ -71,8 +76,8 @@ class Canvas:
         """
         Get the portion of the canvas that should be drawn on the screen.
         
-        Returns a subsurface of the canvas matching the size of the screen,
-        centered on the camera given in the constructor of the canvas.
+        Returns a Rect matching the size of the screen, centered on the camera
+        given in the constructor of the canvas.
         """
         view_width = settings.display["width"]
         view_height = settings.display["height"]
@@ -80,7 +85,7 @@ class Canvas:
         view_rect = Rect(0, 0, view_width, view_height)
         view_rect.center = self.__camera.rect.center
 
-        return self.__canvas.subsurface(view_rect)
+        return view_rect
 
 
 def from_image(
