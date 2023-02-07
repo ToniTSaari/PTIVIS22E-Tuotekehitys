@@ -290,7 +290,6 @@ class Game:
 
         self.player.setmovestate(self.player.angle)
         self.all_sprites.draw(self.screen)
-        self.player_bullets.draw(self.screen)
 
         pygame.display.update()
         
