@@ -4,10 +4,9 @@ from pygame import sprite
 from pygame.locals import *
 import random
 
+import os
+os.chdir(str(__file__[:-8]))
 import canvas
-from common import Vector2
-import keyboard_input
-from player import Player
 from boss import Boss
 from bullet import Bullet
 from common import Vector2
