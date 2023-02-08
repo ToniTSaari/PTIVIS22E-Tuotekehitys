@@ -2,9 +2,8 @@ import pygame
 from pygame import sprite
 from pygame.locals import *
 
-from common import Vector2
-import keyboard_input
-from player import Player
+import os
+os.chdir(str(__file__[:-8]))
 from boss import Boss
 from bullet import Bullet
 from common import Vector2
