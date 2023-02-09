@@ -4,9 +4,9 @@ from pygame import sprite
 from pygame.locals import *
 import random
 
-from common import Vector2
-import keyboard_input
-from player import Player
+import os
+os.chdir(str(__file__[:-8]))
+import canvas
 from boss import Boss
 from bullet import Bullet
 from common import Vector2
@@ -52,6 +52,12 @@ class Game:
         self.player = Player(
             Vector2(self.screen.get_rect().center),
             self.all_sprites
+        )
+
+        # draw everything on the canvas, then draw a part of it on the screen
+        self.canvas = canvas.from_image(
+            pygame.image.load("assets/art/bg/woods.jpg"),
+            self.player
         )
 
         self.mixer = Mixer()
@@ -165,12 +171,6 @@ class Game:
 
         movement_direction = keyboard_input.movement_direction(keys)
         self.player.speed =  movement_direction * self.player.speed_multiplier
-
-        for sprite in self.all_sprites:
-            sprite.rect.x -= round(self.player.speed.x)
-            sprite.rect.y -= round(self.player.speed.y)
-        self.player.rect.x += round(self.player.speed.x)
-        self.player.rect.y += round(self.player.speed.y)
 
         if keys[pygame.K_SPACE] and self.player.can_shoot():
             mouse_x, mouse_y = pygame.mouse.get_pos()
@@ -288,9 +288,8 @@ class Game:
     def render(self) -> None:
         self.screen.fill("pink")
 
-        self.player.setmovestate(self.player.angle)
-        self.all_sprites.draw(self.screen)
-        self.player_bullets.draw(self.screen)
+        self.canvas.draw(self.all_sprites)
+        self.screen.blit(self.canvas.inner, (0,0), self.canvas.camera_view())
 
         pygame.display.update()
         
