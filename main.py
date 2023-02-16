@@ -86,8 +86,9 @@ class Game:
         button_w = 320
         button_h = 100
         button_x = self.width/2 - button_w/2
-        y_ratio = self.height / 5
 
+        #jakamalla ruudun koko viidellä, saa suhdeluvun neljälle menunapille niin että ylä- ja alareunaan jää bufferialue
+        y_ratio = self.height / 5
         s_button_y = y_ratio * 1
         small_button_y = y_ratio * 2
         big_button_y = y_ratio * 3
@@ -191,28 +192,31 @@ class Game:
                     return
 
                 if event.type == pygame.MOUSEBUTTONDOWN:
+                    def resoChange(height, width):
+                        #asetetaan halutut resoluutiot .height ja .width muutujiin ja asetetaan resoluuto näiden muutujien mukaiseksi
+                        self.height = height
+                        self.width = width
+                        self.screen = pygame.display.set_mode((self.width, self.height))
+
+                        #haetaan display dict-muutujaan JSONista tiedot settings.all kautta
+                        display = settings.all["display"]
+
+                        #haetaan dict-muutujaan .height ja .width arvot
+                        display["height"] = self.height
+                        display["width"] = self.width
+
+                        #talletetaan muutokset JSON tiedostoon, "display" osioon ja lähetetään ne .write aliohjelmalle
+                        settings.all["display"] = display
+                        settings.write(settings.all)
+
                     if start_button.collidepoint(mouse_pos):
                         game.main_loop()
 
                     elif big_button.collidepoint(mouse_pos):
-                        self.height = 720
-                        self.width = 1280
-                        self.screen = pygame.display.set_mode((self.width, self.height))
-                        display = settings.all["display"]
-                        display["height"] = self.height
-                        display["width"] = self.width
-                        settings.all["display"] = display
-                        settings.write(settings.all)
+                        resoChange(720,1280)
                         game.main_menu()
                     elif small_button.collidepoint(mouse_pos):
-                        self.height = 600
-                        self.width = 800
-                        self.screen = pygame.display.set_mode((self.width, self.height))
-                        display = settings.all["display"]
-                        display["height"] = self.height
-                        display["width"] = self.width
-                        settings.all["display"] = display
-                        settings.write(settings.all)
+                        resoChange(600,800)
                         game.main_menu()
 
                     elif quit_button.collidepoint(mouse_pos):
