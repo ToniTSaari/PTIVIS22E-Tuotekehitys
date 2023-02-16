@@ -4,12 +4,15 @@ from pygame import sprite
 from pygame.locals import *
 import random
 
+from common import Vector2
 import os
 os.chdir(str(__file__[:-8]))
 import canvas
 from boss import Boss
 from bullet import Bullet
 from mixer import Mixer
+from player import Player
+import keyboard_input
 import settings
 
 
