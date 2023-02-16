@@ -9,9 +9,6 @@ os.chdir(str(__file__[:-8]))
 import canvas
 from boss import Boss
 from bullet import Bullet
-from common import Vector2
-import keyboard_input
-from player import Player
 from mixer import Mixer
 import settings
 
@@ -34,6 +31,13 @@ class Game:
         self.height = settings.display["height"]
         self.screen = pygame.display.set_mode((self.width, self.height))
 
+    def fullscreen_display(self) -> None:
+        self.screen = pygame.display.set_mode((0,0), pygame.FULLSCREEN)
+
+    def change_display(self, wh) -> None:
+        self.width = wh[0]
+        self.height = wh[1]
+        self.screen = pygame.display.set_mode((self.width, self.height))
 
     def start(self) -> None:
         '''Create any necessary game entities and start the game.'''
@@ -72,16 +76,19 @@ class Game:
         temp_highlight = "blue"
         quit_highlight = "red"
 
-        button_w = 250
+        button_w = 320
         button_h = 100
         button_x = self.width/2 - button_w/2
+        y_ratio = self.height / 5
 
-        s_button_y = (self.height - button_h) / 4
-        q_button_y = self.height - (s_button_y + button_h)
-        t_button_y = self.height - (((s_button_y + q_button_y) / 2) + button_h)
+        s_button_y = y_ratio * 1
+        small_button_y = y_ratio * 2
+        big_button_y = y_ratio * 3
+        q_button_y = y_ratio * 4
 
         start_button = Rect(button_x, s_button_y, button_w, button_h)
-        temp_button = Rect(button_x, t_button_y, button_w, button_h)
+        small_button = Rect(button_x, small_button_y, button_w, button_h)
+        big_button = Rect(button_x, big_button_y, button_w, button_h)
         quit_button = Rect(button_x, q_button_y, button_w, button_h)
 
         arial = pygame.font.Font(None, 100)
@@ -95,10 +102,22 @@ class Game:
             self.screen.fill(menu_bg_colour)
 
             start_text = arial.render("Start", True, text_colour)
+
+            big_text = arial.render("1280:720", True, text_colour)
+            small_text = arial.render("800:600", True, text_colour)
+
             quit_text = arial.render("Quit", True, text_colour)
 
             start_button_colour = \
                 start_highlight if start_button.collidepoint(mouse_pos) \
+                    else button_colour
+
+            big_button_colour = \
+                temp_highlight if big_button.collidepoint(mouse_pos) \
+                    else button_colour
+            
+            small_button_colour = \
+                temp_highlight if small_button.collidepoint(mouse_pos) \
                     else button_colour
             
             quit_button_colour = \
@@ -114,6 +133,22 @@ class Game:
 
             pygame.draw.rect(
                 self.screen,
+
+                big_button_colour,
+                big_button,
+                border_radius=10
+            )
+
+            pygame.draw.rect(
+                self.screen,
+                small_button_colour,
+                small_button,
+                border_radius=10
+            )
+
+            pygame.draw.rect(
+                self.screen,
+
                 quit_button_colour,
                 quit_button,
                 border_radius=10
@@ -125,6 +160,18 @@ class Game:
             )
 
             self.screen.blit(
+
+                big_text,
+                Vector2(big_button.center) - big_text.get_rect().center
+            )
+
+            self.screen.blit(
+                small_text,
+                Vector2(small_button.center) - small_text.get_rect().center
+            )
+
+            self.screen.blit(
+
                 quit_text,
                 Vector2(quit_button.center) - quit_text.get_rect().center
             )
@@ -139,8 +186,30 @@ class Game:
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if start_button.collidepoint(mouse_pos):
                         game.main_loop()
+
+                    elif big_button.collidepoint(mouse_pos):
+                        self.height = 720
+                        self.width = 1280
+                        self.screen = pygame.display.set_mode((self.width, self.height))
+                        display = settings.all["display"]
+                        display["height"] = self.height
+                        display["width"] = self.width
+                        settings.all["display"] = display
+                        settings.write(settings.all)
+                        game.main_menu()
+                    elif small_button.collidepoint(mouse_pos):
+                        self.height = 600
+                        self.width = 800
+                        self.screen = pygame.display.set_mode((self.width, self.height))
+                        display = settings.all["display"]
+                        display["height"] = self.height
+                        display["width"] = self.width
+                        settings.all["display"] = display
+                        settings.write(settings.all)
+                        game.main_menu()
+
                     elif quit_button.collidepoint(mouse_pos):
-                        return
+                        pygame.quit()
 
     def main_loop(self) -> None:
         self.mixer.loadmusic(1)
@@ -172,6 +241,29 @@ class Game:
         movement_direction = keyboard_input.movement_direction(keys)
         self.player.speed =  movement_direction * self.player.speed_multiplier
 
+
+        if self.player.speed.x != 0 and self.player.speed.y != 0:
+            # suhde taitaa olla 1.41.. hypotenuusan ja kannan välillä 45 asteessa,
+            # ei toimi ykkösellä hajoaa niin pienistä nopeuksista.
+            self.player.speed.scale_to_length(2.82)
+            for sprite in self.all_sprites:
+                sprite.rect.x -= round(self.player.speed.x)
+                sprite.rect.y -= round(self.player.speed.y)
+            self.player.rect.x += round(self.player.speed.x)
+            self.player.rect.y += round(self.player.speed.y)
+        else:
+            for sprite in self.all_sprites:
+                sprite.rect.x -= round(self.player.speed.x*2)
+                sprite.rect.y -= round(self.player.speed.y*2)
+            self.player.rect.x += round(self.player.speed.x*2)
+            self.player.rect.y += round(self.player.speed.y*2)
+
+        if keys[pygame.K_SPACE] and self.bullet_isready:
+            self.mixer.playsfx(0)
+            Bullet(
+                (self.player.rect.midright),
+                (self.player_bullets, self.all_sprites)
+
         if keys[pygame.K_SPACE] and self.player.can_shoot():
             mouse_x, mouse_y = pygame.mouse.get_pos()
             mouseposvec=Vector2(mouse_x,mouse_y)
@@ -185,6 +277,12 @@ class Game:
 
     def update(self) -> None:
         self.all_sprites.update()
+
+        self.check_bullet_hits(self.boss, self.player_bullets)
+        self.check_bullet_hits(self.player, self.enemy_bullets)
+        self.check_game_over()
+        self.bullet_timer()
+
 
         self.boss_attack()
 
@@ -265,6 +363,7 @@ class Game:
         return (text_image, text_rect.topleft)
 
     def press_any_button_to_quit(self) -> None:
+
         pygame.mixer.music.pause()
         pygame.time.wait(2000) # wait 2 seconds to avoid accidents
         pygame.event.get() # clear the event queue for the same reason
@@ -272,7 +371,6 @@ class Game:
             for event in pygame.event.get():
                 if event.type in [QUIT, MOUSEBUTTONDOWN, KEYDOWN]:
                     quit()
-
 
     def keep_bounds(self) -> None:
         if self.player.top < 0:
@@ -288,8 +386,13 @@ class Game:
     def render(self) -> None:
         self.screen.fill("pink")
 
+        self.player.setmovestate(self.player.angle)
+        self.all_sprites.draw(self.screen)
+        self.player_bullets.draw(self.screen)
+
         self.canvas.draw(self.all_sprites)
         self.screen.blit(self.canvas.inner, (0,0), self.canvas.camera_view())
+
 
         pygame.display.update()
         

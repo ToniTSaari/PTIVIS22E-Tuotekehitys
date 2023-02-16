@@ -34,6 +34,8 @@ class Player(pygame.sprite.Sprite):
 
         self.hp = 3
 
+        self.hp = 3
+
         self.mask = pygame.mask.from_surface(self.image)
 
         self.default_shot_cooldown = 15

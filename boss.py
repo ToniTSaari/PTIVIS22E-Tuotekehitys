@@ -28,7 +28,6 @@ class Boss(pygame.sprite.Sprite):
         self.hp = 20
 
         self.patterns = Patterns()
-
         self.mask = pygame.mask.from_surface(self.image)
         self._layer = 2
 
@@ -72,4 +71,4 @@ class Boss(pygame.sprite.Sprite):
 
     def shoot(self) -> None:
         print(self.patterns.roundpattern())
-        
+
