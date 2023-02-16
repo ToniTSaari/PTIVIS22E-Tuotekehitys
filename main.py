@@ -174,11 +174,22 @@ class Game:
         self.player.speed =  movement_direction * self.player.speed_multiplier
 
         if keys[pygame.K_SPACE] and self.player.can_shoot():
-            mouse_x, mouse_y = pygame.mouse.get_pos()
-            mouseposvec=Vector2(mouse_x,mouse_y)
             self.mixer.playsfx(0)
+
+            # calculate where the mouse is on the canvas relative to the player
+            # based on where it is relative to the centre of the screen
+            display_centre_x = settings.display["width"] / 2
+            display_centre_y = settings.display["height"] / 2
+            display_centre = Vector2(display_centre_x, display_centre_y)
+
+            mouse_pos = Vector2(pygame.mouse.get_pos())
+            mouse_rel_to_centre = display_centre - mouse_pos
+            mouse_rel_to_player = self.player.rect.center - mouse_rel_to_centre
+            
+            # shoot a bullet towards the point specified above
+            #TODO: construct bullets from a direction, not a point
             Bullet(
-                mouseposvec,
+                mouse_rel_to_player,
                 self.player.rect.center,
                 (self.player_bullets, self.all_sprites),
             )
