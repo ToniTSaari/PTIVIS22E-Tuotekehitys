@@ -15,8 +15,6 @@ from player import Player
 import keyboard_input
 import settings
 
-
-
 class Game:
     def __init__(self) -> None:
         '''Create a game and set up the window, environment, etc.'''
