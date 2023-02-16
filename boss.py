@@ -1,4 +1,6 @@
 import pygame
+from bullet import Bullet
+from patterns import Patterns
 
 from common import Vector2
 
@@ -25,11 +27,24 @@ class Boss(pygame.sprite.Sprite):
 
         self.hp = 20
 
+        self.patterns = Patterns()
         self.mask = pygame.mask.from_surface(self.image)
         self._layer = 2
 
+        self.default_shot_cooldown = 40
+        self.shot_cooldown = 120
+
     def update(self) -> None:
-        pass
+        self.__tick_shot_cooldown()
+
+    def __tick_shot_cooldown(self) -> None:
+        if self.shot_cooldown > 0:
+            self.shot_cooldown -= 1
+        else:
+            self.shot_cooldown = self.default_shot_cooldown
+
+    def can_shoot(self) -> bool:
+        return self.shot_cooldown == 0
 
     @property
     def x(self) -> float:
@@ -53,3 +68,7 @@ class Boss(pygame.sprite.Sprite):
 
     def take_damage(self, amount: int) -> None:
         self.hp = max(self.hp - 1, 0)
+
+    def shoot(self) -> None:
+        print(self.patterns.roundpattern())
+

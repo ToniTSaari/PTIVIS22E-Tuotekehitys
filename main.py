@@ -1,10 +1,12 @@
+from math import sin, cos
 import pygame
 from pygame import sprite
 from pygame.locals import *
+import random
 
-from common import Vector2
-import keyboard_input
-from player import Player
+import os
+os.chdir(str(__file__[:-8]))
+import canvas
 from boss import Boss
 from bullet import Bullet
 from mixer import Mixer
@@ -14,7 +16,7 @@ import settings
 class Game:
     def __init__(self) -> None:
         '''Create a game and set up the window, environment, etc.'''
-        pygame.mixer.pre_init(44100,16,4,1024)#Frequecy,size,channels,buffer
+        pygame.mixer.pre_init(44100,-16,4,1024)#Frequecy,size,channels,buffer
         pygame.init()
         settings.init()
 
@@ -56,12 +58,13 @@ class Game:
             self.all_sprites
         )
 
-        self.mixer = Mixer()
+        # draw everything on the canvas, then draw a part of it on the screen
+        self.canvas = canvas.from_image(
+            pygame.image.load("assets/art/bg/woods.jpg"),
+            self.player
+        )
 
-        
-        # set up shooting cooldown tracking
-        self.bullet_cooldown = 0
-        self.bullet_isready = True
+        self.mixer = Mixer()
 
         game.main_menu()
 
@@ -99,8 +102,10 @@ class Game:
             self.screen.fill(menu_bg_colour)
 
             start_text = arial.render("Start", True, text_colour)
+
             big_text = arial.render("1280:720", True, text_colour)
             small_text = arial.render("800:600", True, text_colour)
+
             quit_text = arial.render("Quit", True, text_colour)
 
             start_button_colour = \
@@ -128,6 +133,7 @@ class Game:
 
             pygame.draw.rect(
                 self.screen,
+
                 big_button_colour,
                 big_button,
                 border_radius=10
@@ -142,6 +148,7 @@ class Game:
 
             pygame.draw.rect(
                 self.screen,
+
                 quit_button_colour,
                 quit_button,
                 border_radius=10
@@ -153,6 +160,7 @@ class Game:
             )
 
             self.screen.blit(
+
                 big_text,
                 Vector2(big_button.center) - big_text.get_rect().center
             )
@@ -163,6 +171,7 @@ class Game:
             )
 
             self.screen.blit(
+
                 quit_text,
                 Vector2(quit_button.center) - quit_text.get_rect().center
             )
@@ -177,6 +186,7 @@ class Game:
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if start_button.collidepoint(mouse_pos):
                         game.main_loop()
+
                     elif big_button.collidepoint(mouse_pos):
                         self.height = 720
                         self.width = 1280
@@ -197,6 +207,7 @@ class Game:
                         settings.all["display"] = display
                         settings.write(settings.all)
                         game.main_menu()
+
                     elif quit_button.collidepoint(mouse_pos):
                         pygame.quit()
 
@@ -230,6 +241,7 @@ class Game:
         movement_direction = keyboard_input.movement_direction(keys)
         self.player.speed =  movement_direction * self.player.speed_multiplier
 
+
         if self.player.speed.x != 0 and self.player.speed.y != 0:
             # suhde taitaa olla 1.41.. hypotenuusan ja kannan välillä 45 asteessa,
             # ei toimi ykkösellä hajoaa niin pienistä nopeuksista.
@@ -251,16 +263,51 @@ class Game:
             Bullet(
                 (self.player.rect.midright),
                 (self.player_bullets, self.all_sprites)
+
+        if keys[pygame.K_SPACE] and self.player.can_shoot():
+            mouse_x, mouse_y = pygame.mouse.get_pos()
+            mouseposvec=Vector2(mouse_x,mouse_y)
+            self.mixer.playsfx(0)
+            Bullet(
+                mouseposvec,
+                self.player.rect.center,
+                (self.player_bullets, self.all_sprites),
             )
-            self.bullet_isready = False
 
 
     def update(self) -> None:
         self.all_sprites.update()
+
         self.check_bullet_hits(self.boss, self.player_bullets)
         self.check_bullet_hits(self.player, self.enemy_bullets)
         self.check_game_over()
         self.bullet_timer()
+
+
+        self.boss_attack()
+
+        self.check_bullet_hits(self.boss, self.player_bullets)
+        self.check_bullet_hits(self.player, self.enemy_bullets)
+
+        self.check_game_over()
+
+    def boss_attack(self) -> None:
+        if self.boss.can_shoot():
+            bullets_per_shot = 13
+            shot_angle = 360 / bullets_per_shot
+            starting_angle = random.uniform(0, shot_angle)
+            base_vector = Vector2(cos(starting_angle), sin(starting_angle))
+            vectors = [
+                base_vector.rotate(shot_angle * i) + self.boss.rect.center
+                for i in range(bullets_per_shot)
+            ]
+            for v in vectors:
+                Bullet(
+                    v,
+                    self.boss.rect.center,
+                    (self.enemy_bullets, self.all_sprites),
+                )
+
            
     def check_bullet_hits(
         self,
@@ -316,11 +363,14 @@ class Game:
         return (text_image, text_rect.topleft)
 
     def press_any_button_to_quit(self) -> None:
+
+        pygame.mixer.music.pause()
+        pygame.time.wait(2000) # wait 2 seconds to avoid accidents
+        pygame.event.get() # clear the event queue for the same reason
         while True:
             for event in pygame.event.get():
                 if event.type in [QUIT, MOUSEBUTTONDOWN, KEYDOWN]:
                     quit()
-        
 
     def keep_bounds(self) -> None:
         if self.player.top < 0:
@@ -340,17 +390,13 @@ class Game:
         self.all_sprites.draw(self.screen)
         self.player_bullets.draw(self.screen)
 
+        self.canvas.draw(self.all_sprites)
+        self.screen.blit(self.canvas.inner, (0,0), self.canvas.camera_view())
+
+
         pygame.display.update()
-
-    
-    def bullet_timer(self) -> None:
-        self.bullet_cooldown += 1
-
-        if self.bullet_cooldown >= 15:
-            self.bullet_cooldown = 0
-            self.bullet_isready = True
         
-  
+
 
 # runs when executed as a script but not when imported
 if __name__ == "__main__":

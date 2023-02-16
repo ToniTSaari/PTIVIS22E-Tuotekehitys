@@ -30,15 +30,16 @@ class Player(pygame.sprite.Sprite):
         self.__y = position.y - self.__height/2
 
         self.speed = Vector2(0,0)
-        self.speed_multiplier = 1
-        
-        self.rect = self.image.get_rect()
-        self.rect.x = self.x
-        self.rect.y = self.y
+        self.speed_multiplier = 5
+
+        self.hp = 3
 
         self.hp = 3
 
         self.mask = pygame.mask.from_surface(self.image)
+
+        self.default_shot_cooldown = 15
+        self.shot_cooldown = 0
 
     @property
     def x(self) -> float:
@@ -74,6 +75,11 @@ class Player(pygame.sprite.Sprite):
     def height(self) -> int:
         return self.__height
 
+    @property
+    def rect(self) -> pygame.Rect:
+        r = self.image.get_rect()
+        (r.left, r.top) = (round(self.x), round(self.y))
+        return r
 
     @property
     def left(self) -> float:
@@ -114,11 +120,24 @@ class Player(pygame.sprite.Sprite):
     def take_damage(self, amount: int) -> None:
         self.hp = max(self.hp - 1, 0)
 
-
+    def update(self) -> None:
+        self.move(self.speed)
+        self.__tick_shot_cooldown()
+    
     def move(self, speed: Vector2) -> None:
         """Move the player by a given amount in two dimensions."""
         self.__x += speed.x
         self.__y += speed.y
+        self.setmovestate(self.angle)
+
+    def __tick_shot_cooldown(self) -> None:
+        if self.shot_cooldown > 0:
+            self.shot_cooldown -= 1
+        else:
+            self.shot_cooldown = self.default_shot_cooldown
+
+    def can_shoot(self) -> bool:
+        return self.shot_cooldown == 0
 
     def setmovestate(self,angle: float,)-> None:
         if self.speed == [0,0]:
