@@ -13,6 +13,7 @@ from mixer import Mixer
 import settings
 
 
+
 class Game:
     def __init__(self) -> None:
         '''Create a game and set up the window, environment, etc.'''
@@ -262,7 +263,7 @@ class Game:
             self.mixer.playsfx(0)
             Bullet(
                 (self.player.rect.midright),
-                (self.player_bullets, self.all_sprites)
+                (self.player_bullets, self.all_sprites))
 
         if keys[pygame.K_SPACE] and self.player.can_shoot():
             mouse_x, mouse_y = pygame.mouse.get_pos()
