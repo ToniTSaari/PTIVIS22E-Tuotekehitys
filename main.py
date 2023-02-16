@@ -70,6 +70,9 @@ class Game:
 
         self.mixer = Mixer()
 
+        self.bullet_cooldown = 0
+        self.bullet_isready = True
+
         game.main_menu()
 
     def main_menu(self) -> None:
@@ -262,12 +265,6 @@ class Game:
             self.player.rect.x += round(self.player.speed.x*2)
             self.player.rect.y += round(self.player.speed.y*2)
 
-        if keys[pygame.K_SPACE] and self.bullet_isready:
-            self.mixer.playsfx(0)
-            Bullet(
-                (self.player.rect.midright),
-                (self.player_bullets, self.all_sprites))
-
         if keys[pygame.K_SPACE] and self.player.can_shoot():
             mouse_x, mouse_y = pygame.mouse.get_pos()
             mouseposvec=Vector2(mouse_x,mouse_y)
@@ -400,6 +397,12 @@ class Game:
 
         pygame.display.update()
         
+    def bullet_timer(self) -> None:
+        self.bullet_cooldown += 1
+
+        if self.bullet_cooldown >= 15:
+            self.bullet_cooldown = 0
+            self.bullet_isready = True
 
 
 # runs when executed as a script but not when imported
