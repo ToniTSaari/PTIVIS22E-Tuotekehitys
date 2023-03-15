@@ -34,8 +34,6 @@ class Player(pygame.sprite.Sprite):
 
         self.hp = 3
 
-        self.hp = 3
-
         self.mask = pygame.mask.from_surface(self.image)
 
         self.default_shot_cooldown = 15
@@ -77,7 +75,7 @@ class Player(pygame.sprite.Sprite):
 
     @property
     def rect(self) -> pygame.Rect:
-        r = self.image.get_rect()
+        r = self.mask.get_rect()
         (r.left, r.top) = (round(self.x), round(self.y))
         return r
 

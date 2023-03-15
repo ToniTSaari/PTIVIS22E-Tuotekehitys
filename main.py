@@ -1,20 +1,22 @@
+# standardise working directory because it can be inconsistent
+import os
+os.chdir(str(__file__[:-8]))
+
+
 from math import sin, cos
 import pygame
 from pygame import sprite
 from pygame.locals import *
 import random
 
-from common import Vector2
-import os
-os.chdir(str(__file__[:-8]))
 import canvas
+from common import Vector2
+import keyboard_input
+from player import Player
 from boss import Boss
 from bullet import Bullet
 from mixer import Mixer
-from player import Player
-import keyboard_input
 import settings
-
 
 
 class Game:
@@ -43,6 +45,7 @@ class Game:
         self.height = wh[1]
         self.screen = pygame.display.set_mode((self.width, self.height))
 
+
     def start(self) -> None:
         '''Create any necessary game entities and start the game.'''
         # sprite groups for conveniently updating and rendering game entities
@@ -69,9 +72,6 @@ class Game:
         )
 
         self.mixer = Mixer()
-
-        self.bullet_cooldown = 0
-        self.bullet_isready = True
 
         game.main_menu()
 
@@ -252,29 +252,23 @@ class Game:
         movement_direction = keyboard_input.movement_direction(keys)
         self.player.speed =  movement_direction * self.player.speed_multiplier
 
-
-        if self.player.speed.x != 0 and self.player.speed.y != 0:
-            # suhde taitaa olla 1.41.. hypotenuusan ja kannan välillä 45 asteessa,
-            # ei toimi ykkösellä hajoaa niin pienistä nopeuksista.
-            self.player.speed.scale_to_length(2.82)
-            for sprite in self.all_sprites:
-                sprite.rect.x -= round(self.player.speed.x)
-                sprite.rect.y -= round(self.player.speed.y)
-            self.player.rect.x += round(self.player.speed.x)
-            self.player.rect.y += round(self.player.speed.y)
-        else:
-            for sprite in self.all_sprites:
-                sprite.rect.x -= round(self.player.speed.x*2)
-                sprite.rect.y -= round(self.player.speed.y*2)
-            self.player.rect.x += round(self.player.speed.x*2)
-            self.player.rect.y += round(self.player.speed.y*2)
-
         if keys[pygame.K_SPACE] and self.player.can_shoot():
-            mouse_x, mouse_y = pygame.mouse.get_pos()
-            mouseposvec=Vector2(mouse_x,mouse_y)
             self.mixer.playsfx(0)
+
+            # calculate where the mouse is on the canvas relative to the player
+            # based on where it is relative to the centre of the screen
+            display_centre_x = settings.display["width"] / 2
+            display_centre_y = settings.display["height"] / 2
+            display_centre = Vector2(display_centre_x, display_centre_y)
+
+            mouse_pos = Vector2(pygame.mouse.get_pos())
+            mouse_rel_to_centre = display_centre - mouse_pos
+            mouse_rel_to_player = self.player.rect.center - mouse_rel_to_centre
+            
+            # shoot a bullet towards the point specified above
+            #TODO: construct bullets from a direction, not a point
             Bullet(
-                mouseposvec,
+                mouse_rel_to_player,
                 self.player.rect.center,
                 (self.player_bullets, self.all_sprites),
             )
@@ -282,12 +276,6 @@ class Game:
 
     def update(self) -> None:
         self.all_sprites.update()
-
-        self.check_bullet_hits(self.boss, self.player_bullets)
-        self.check_bullet_hits(self.player, self.enemy_bullets)
-        self.check_game_over()
-        self.bullet_timer()
-
 
         self.boss_attack()
 
@@ -368,7 +356,6 @@ class Game:
         return (text_image, text_rect.topleft)
 
     def press_any_button_to_quit(self) -> None:
-
         pygame.mixer.music.pause()
         pygame.time.wait(2000) # wait 2 seconds to avoid accidents
         pygame.event.get() # clear the event queue for the same reason
@@ -376,6 +363,7 @@ class Game:
             for event in pygame.event.get():
                 if event.type in [QUIT, MOUSEBUTTONDOWN, KEYDOWN]:
                     quit()
+
 
     def keep_bounds(self) -> None:
         if self.player.top < 0:
@@ -391,22 +379,11 @@ class Game:
     def render(self) -> None:
         self.screen.fill("pink")
 
-        self.player.setmovestate(self.player.angle)
-        self.all_sprites.draw(self.screen)
-        self.player_bullets.draw(self.screen)
-
         self.canvas.draw(self.all_sprites)
         self.screen.blit(self.canvas.inner, (0,0), self.canvas.camera_view())
 
-
         pygame.display.update()
         
-    def bullet_timer(self) -> None:
-        self.bullet_cooldown += 1
-
-        if self.bullet_cooldown >= 15:
-            self.bullet_cooldown = 0
-            self.bullet_isready = True
 
 
 # runs when executed as a script but not when imported
