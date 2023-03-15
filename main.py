@@ -10,9 +10,6 @@ import keyboard_input
 from player import Player
 from boss import Boss
 from bullet import Bullet
-from common import Vector2
-import keyboard_input
-from player import Player
 from mixer import Mixer
 import settings
 
