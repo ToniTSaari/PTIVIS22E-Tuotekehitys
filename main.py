@@ -1,3 +1,8 @@
+# standardise working directory because it can be inconsistent
+import os
+os.chdir(str(__file__[:-8]))
+
+
 from math import sin, cos
 import pygame
 from pygame import sprite
