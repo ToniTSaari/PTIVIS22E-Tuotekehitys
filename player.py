@@ -75,7 +75,7 @@ class Player(pygame.sprite.Sprite):
 
     @property
     def rect(self) -> pygame.Rect:
-        r = self.image.get_rect()
+        r = self.mask.get_rect()
         (r.left, r.top) = (round(self.x), round(self.y))
         return r
 
