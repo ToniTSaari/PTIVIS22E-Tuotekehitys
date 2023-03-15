@@ -37,6 +37,14 @@ class Game:
         self.height = settings.display["height"]
         self.screen = pygame.display.set_mode((self.width, self.height))
 
+    def fullscreen_display(self) -> None:
+        self.screen = pygame.display.set_mode((0,0), pygame.FULLSCREEN)
+
+    def change_display(self, wh) -> None:
+        self.width = wh[0]
+        self.height = wh[1]
+        self.screen = pygame.display.set_mode((self.width, self.height))
+
 
     def start(self) -> None:
         '''Create any necessary game entities and start the game.'''
@@ -75,16 +83,20 @@ class Game:
         temp_highlight = "blue"
         quit_highlight = "red"
 
-        button_w = 250
+        button_w = 320
         button_h = 100
         button_x = self.width/2 - button_w/2
 
-        s_button_y = (self.height - button_h) / 4
-        q_button_y = self.height - (s_button_y + button_h)
-        t_button_y = self.height - (((s_button_y + q_button_y) / 2) + button_h)
+        #jakamalla ruudun koko viidellä, saa suhdeluvun neljälle menunapille niin että ylä- ja alareunaan jää bufferialue
+        y_ratio = self.height / 5
+        s_button_y = y_ratio * 1
+        small_button_y = y_ratio * 2
+        big_button_y = y_ratio * 3
+        q_button_y = y_ratio * 4
 
         start_button = Rect(button_x, s_button_y, button_w, button_h)
-        temp_button = Rect(button_x, t_button_y, button_w, button_h)
+        small_button = Rect(button_x, small_button_y, button_w, button_h)
+        big_button = Rect(button_x, big_button_y, button_w, button_h)
         quit_button = Rect(button_x, q_button_y, button_w, button_h)
 
         arial = pygame.font.Font(None, 100)
@@ -98,10 +110,22 @@ class Game:
             self.screen.fill(menu_bg_colour)
 
             start_text = arial.render("Start", True, text_colour)
+
+            big_text = arial.render("1280:720", True, text_colour)
+            small_text = arial.render("800:600", True, text_colour)
+
             quit_text = arial.render("Quit", True, text_colour)
 
             start_button_colour = \
                 start_highlight if start_button.collidepoint(mouse_pos) \
+                    else button_colour
+
+            big_button_colour = \
+                temp_highlight if big_button.collidepoint(mouse_pos) \
+                    else button_colour
+            
+            small_button_colour = \
+                temp_highlight if small_button.collidepoint(mouse_pos) \
                     else button_colour
             
             quit_button_colour = \
@@ -117,6 +141,22 @@ class Game:
 
             pygame.draw.rect(
                 self.screen,
+
+                big_button_colour,
+                big_button,
+                border_radius=10
+            )
+
+            pygame.draw.rect(
+                self.screen,
+                small_button_colour,
+                small_button,
+                border_radius=10
+            )
+
+            pygame.draw.rect(
+                self.screen,
+
                 quit_button_colour,
                 quit_button,
                 border_radius=10
@@ -128,6 +168,18 @@ class Game:
             )
 
             self.screen.blit(
+
+                big_text,
+                Vector2(big_button.center) - big_text.get_rect().center
+            )
+
+            self.screen.blit(
+                small_text,
+                Vector2(small_button.center) - small_text.get_rect().center
+            )
+
+            self.screen.blit(
+
                 quit_text,
                 Vector2(quit_button.center) - quit_text.get_rect().center
             )
@@ -140,10 +192,35 @@ class Game:
                     return
 
                 if event.type == pygame.MOUSEBUTTONDOWN:
+                    def resoChange(height, width):
+                        #asetetaan halutut resoluutiot .height ja .width muutujiin ja asetetaan resoluuto näiden muutujien mukaiseksi
+                        self.height = height
+                        self.width = width
+                        self.screen = pygame.display.set_mode((self.width, self.height))
+
+                        #haetaan display dict-muutujaan JSONista tiedot settings.all kautta
+                        display = settings.all["display"]
+
+                        #haetaan dict-muutujaan .height ja .width arvot
+                        display["height"] = self.height
+                        display["width"] = self.width
+
+                        #talletetaan muutokset JSON tiedostoon, "display" osioon ja lähetetään ne .write aliohjelmalle
+                        settings.all["display"] = display
+                        settings.write(settings.all)
+
                     if start_button.collidepoint(mouse_pos):
                         game.main_loop()
+
+                    elif big_button.collidepoint(mouse_pos):
+                        resoChange(720,1280)
+                        game.main_menu()
+                    elif small_button.collidepoint(mouse_pos):
+                        resoChange(600,800)
+                        game.main_menu()
+
                     elif quit_button.collidepoint(mouse_pos):
-                        return
+                        pygame.quit()
 
     def main_loop(self) -> None:
         self.mixer.loadmusic(1)
