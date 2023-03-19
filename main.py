@@ -277,6 +277,8 @@ class Game:
                 (self.player_bullets, self.all_sprites),
             )
 
+            self.player.shot_cooldown = self.player.default_shot_cooldown
+
 
     def update(self) -> None:
         self.all_sprites.update()
