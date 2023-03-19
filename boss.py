@@ -25,7 +25,8 @@ class Boss(pygame.sprite.Sprite):
         self.rect.x = self.__x
         self.rect.y = self.__y
 
-        self.hp = 20
+        self.max_hp = 20
+        self.hp = self.max_hp
 
         self.patterns = Patterns()
         self.mask = pygame.mask.from_surface(self.image)

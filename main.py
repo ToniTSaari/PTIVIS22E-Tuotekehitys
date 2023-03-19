@@ -410,8 +410,35 @@ class Game:
 
 
     def draw_boss_health(self) -> None:
-        pass
+        # 2 bars: one for the actual health display, another for its background
+        bar_colour = "#202020"
+        inner_bar_colour = "red"
+
+        bottom_margin = 30
+        bar_width = int(settings.display["width"] / 3)
+        bar_height = 14
+        bar_padding = 2
+
+        inner_bar_height = bar_height - 2 * bar_padding
+        inner_bar_max_width = bar_width - 2 * bar_padding
+        inner_bar_width = inner_bar_max_width * self.boss.hp / self.boss.max_hp
         
+        bar_x = (settings.display["width"] - bar_width) / 2
+        bar_y = settings.display["height"] - bottom_margin - bar_height
+        inner_bar_x = bar_x + bar_padding
+        inner_bar_y = bar_y + bar_padding
+
+        pygame.draw.rect(
+            self.screen,
+            bar_colour,
+            (bar_x, bar_y, bar_width, bar_height)
+        )
+
+        pygame.draw.rect(
+            self.screen,
+            inner_bar_colour,
+            (inner_bar_x, inner_bar_y, inner_bar_width, inner_bar_height)
+        )
 
 
 # runs when executed as a script but not when imported
