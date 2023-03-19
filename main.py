@@ -292,6 +292,7 @@ class Game:
 
     def update(self) -> None:
         self.all_sprites.update()
+        self.keep_player_in_bounds()
 
         self.boss_attack()
 
@@ -381,19 +382,19 @@ class Game:
                     quit()
 
 
-    def keep_bounds(self) -> None:
+    def keep_player_in_bounds(self) -> None:
         if self.player.top < 0:
             self.player.top = 0
-        if self.player.bottom > self.height:
-            self.player.bottom = self.height
-        if self.player.right > self.width:
-            self.player.right = self.width
+        if self.player.bottom > self.canvas.inner.get_height():
+            self.player.bottom = self.canvas.inner.get_height()
+        if self.player.right > self.canvas.inner.get_width():
+            self.player.right = self.canvas.inner.get_width()
         if self.player.left < 0:
             self.player.left = 0
 
 
     def render(self) -> None:
-        self.screen.fill("pink")
+        self.screen.fill("#202020")
 
         self.canvas.draw(self.all_sprites)
         self.screen.blit(self.canvas.inner, (0,0), self.canvas.camera_view())
