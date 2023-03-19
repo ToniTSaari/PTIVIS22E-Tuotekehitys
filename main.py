@@ -31,6 +31,10 @@ class Game:
         self.clock = pygame.time.Clock()
         self.framerate = 60
 
+        # load the image used for the player's hearts
+        # couldn't think of a more fitting place for this, feel free to move it
+        self.heart_image = pygame.image.load("assets/art/heart.png")
+
 
     def initialise_display(self) -> None:
         self.width = settings.display["width"]
@@ -382,7 +386,31 @@ class Game:
         self.canvas.draw(self.all_sprites)
         self.screen.blit(self.canvas.inner, (0,0), self.canvas.camera_view())
 
+        self.draw_hud()
+
         pygame.display.update()
+
+    def draw_hud(self) -> None:
+        self.draw_player_health()
+        self.draw_boss_health()
+
+    def draw_player_health(self) -> None:
+        # margins for the entire player health bar from the edges of the window
+        top_margin = 30
+        left_margin = 30
+
+        heart_width = self.heart_image.get_width()
+        # empty space between hearts
+        hearts_offset = 10
+
+        # show a heart for each point of hp the player has
+        for i in range(self.player.hp):
+            x_offset = i * (hearts_offset + heart_width) + left_margin
+            self.screen.blit(self.heart_image, (x_offset, top_margin))
+
+
+    def draw_boss_health(self) -> None:
+        pass
         
 
 
