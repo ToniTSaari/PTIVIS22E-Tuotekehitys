@@ -59,19 +59,29 @@ class Game:
         self.player_bullets = sprite.Group()
         self.enemy_bullets = sprite.Group()
 
+        bg_woods = pygame.image.load("assets/art/bg/woods.jpg")
+
         self.boss = Boss(
-            Vector2(self.width/2, 144),
+            # place the boss in the middle of the arena
+            Vector2(
+                bg_woods.get_width()/2,
+                bg_woods.get_height()/2
+            ),
             (self.all_sprites, self.collider_group)
         )
 
         self.player = Player(
-            Vector2(self.screen.get_rect().center),
+            # place the player a bit above the bottom centre of the arena
+            Vector2(
+                bg_woods.get_width()/2,
+                bg_woods.get_height() * 3/4
+            ),
             self.all_sprites
         )
 
         # draw everything on the canvas, then draw a part of it on the screen
         self.canvas = canvas.from_image(
-            pygame.image.load("assets/art/bg/woods.jpg"),
+            bg_woods,
             self.player
         )
 
