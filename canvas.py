@@ -1,4 +1,3 @@
-import pygame
 from pygame import Color, Rect, Surface
 from pygame.sprite import Sprite, Group
 
