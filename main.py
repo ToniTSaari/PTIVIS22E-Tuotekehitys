@@ -31,6 +31,10 @@ class Game:
         self.clock = pygame.time.Clock()
         self.framerate = 60
 
+        # load the image used for the player's hearts
+        # couldn't think of a more fitting place for this, feel free to move it
+        self.heart_image = pygame.image.load("assets/art/heart.png")
+
 
     def initialise_display(self) -> None:
         self.width = settings.display["width"]
@@ -55,19 +59,29 @@ class Game:
         self.player_bullets = sprite.Group()
         self.enemy_bullets = sprite.Group()
 
+        bg_woods = pygame.image.load("assets/art/bg/woods.jpg")
+
         self.boss = Boss(
-            Vector2(self.width/2, 144),
+            # place the boss in the middle of the arena
+            Vector2(
+                bg_woods.get_width()/2,
+                bg_woods.get_height()/2
+            ),
             (self.all_sprites, self.collider_group)
         )
 
         self.player = Player(
-            Vector2(self.screen.get_rect().center),
+            # place the player a bit above the bottom centre of the arena
+            Vector2(
+                bg_woods.get_width()/2,
+                bg_woods.get_height() * 3/4
+            ),
             self.all_sprites
         )
 
         # draw everything on the canvas, then draw a part of it on the screen
         self.canvas = canvas.from_image(
-            pygame.image.load("assets/art/bg/woods.jpg"),
+            bg_woods,
             self.player
         )
 
@@ -273,9 +287,12 @@ class Game:
                 (self.player_bullets, self.all_sprites),
             )
 
+            self.player.shot_cooldown = self.player.default_shot_cooldown
+
 
     def update(self) -> None:
         self.all_sprites.update()
+        self.keep_player_in_bounds()
 
         self.boss_attack()
 
@@ -365,25 +382,76 @@ class Game:
                     quit()
 
 
-    def keep_bounds(self) -> None:
+    def keep_player_in_bounds(self) -> None:
         if self.player.top < 0:
             self.player.top = 0
-        if self.player.bottom > self.height:
-            self.player.bottom = self.height
-        if self.player.right > self.width:
-            self.player.right = self.width
+        if self.player.bottom > self.canvas.inner.get_height():
+            self.player.bottom = self.canvas.inner.get_height()
+        if self.player.right > self.canvas.inner.get_width():
+            self.player.right = self.canvas.inner.get_width()
         if self.player.left < 0:
             self.player.left = 0
 
 
     def render(self) -> None:
-        self.screen.fill("pink")
+        self.screen.fill("#202020")
 
         self.canvas.draw(self.all_sprites)
         self.screen.blit(self.canvas.inner, (0,0), self.canvas.camera_view())
 
+        self.draw_hud()
+
         pygame.display.update()
+
+    def draw_hud(self) -> None:
+        self.draw_player_health()
+        self.draw_boss_health()
+
+    def draw_player_health(self) -> None:
+        # margins for the entire player health bar from the edges of the window
+        top_margin = 30
+        left_margin = 30
+
+        heart_width = self.heart_image.get_width()
+        # empty space between hearts
+        hearts_offset = 10
+
+        # show a heart for each point of hp the player has
+        for i in range(self.player.hp):
+            x_offset = i * (hearts_offset + heart_width) + left_margin
+            self.screen.blit(self.heart_image, (x_offset, top_margin))
+
+
+    def draw_boss_health(self) -> None:
+        # 2 bars: one for the actual health display, another for its background
+        bar_colour = "#202020"
+        inner_bar_colour = "red"
+
+        bottom_margin = 30
+        bar_width = int(settings.display["width"] / 3)
+        bar_height = 14
+        bar_padding = 2
+
+        inner_bar_height = bar_height - 2 * bar_padding
+        inner_bar_max_width = bar_width - 2 * bar_padding
+        inner_bar_width = inner_bar_max_width * self.boss.hp / self.boss.max_hp
         
+        bar_x = (settings.display["width"] - bar_width) / 2
+        bar_y = settings.display["height"] - bottom_margin - bar_height
+        inner_bar_x = bar_x + bar_padding
+        inner_bar_y = bar_y + bar_padding
+
+        pygame.draw.rect(
+            self.screen,
+            bar_colour,
+            (bar_x, bar_y, bar_width, bar_height)
+        )
+
+        pygame.draw.rect(
+            self.screen,
+            inner_bar_colour,
+            (inner_bar_x, inner_bar_y, inner_bar_width, inner_bar_height)
+        )
 
 
 # runs when executed as a script but not when imported

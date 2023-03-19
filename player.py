@@ -131,8 +131,6 @@ class Player(pygame.sprite.Sprite):
     def __tick_shot_cooldown(self) -> None:
         if self.shot_cooldown > 0:
             self.shot_cooldown -= 1
-        else:
-            self.shot_cooldown = self.default_shot_cooldown
 
     def can_shoot(self) -> bool:
         return self.shot_cooldown == 0

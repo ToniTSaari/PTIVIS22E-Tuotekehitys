@@ -35,11 +35,8 @@ class Bullet(pygame.sprite.Sprite):
             self.rect.x += self.speed_x
             self.rect.y += self.speed_y
 
-            display_width = settings.display["width"]
-            display_height = settings.display["height"]
-
-            if self.rect.centerx > display_width * 2 \
-            or self.rect.centerx < -display_width \
-            or self.rect.centery > display_height * 2 \
-            or self.rect.centery < -display_height:
+            if self.rect.centerx > 5000 \
+            or self.rect.centerx < 0 \
+            or self.rect.centery > 5000 \
+            or self.rect.centery < 0:
                 self.kill()
