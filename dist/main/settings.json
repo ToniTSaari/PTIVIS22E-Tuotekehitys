@@ -1,0 +1,14 @@
+{
+    "display": {
+        "width": 1280,
+        "height": 720
+    },
+    "ambientm": {
+        "0": "assets/music/ambient/311_Swamp_Thing.mp3",
+        "1": "assets/music/ambient/352_Black_Rider.mp3"
+    },
+    "sfxm": {
+        "0": "assets/music/sfx/woosh-shoot-sfx.wav",
+        "1": "assets/music/sfx/bash-hit-sfx.ogg"
+    }
+}
