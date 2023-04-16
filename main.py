@@ -204,7 +204,7 @@ class Game:
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    return
+                    exit()
 
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     def resoChange(height, width):
@@ -235,7 +235,7 @@ class Game:
                         game.main_menu()
 
                     elif quit_button.collidepoint(mouse_pos):
-                        pygame.quit()
+                        exit()
 
     def main_loop(self) -> None:
         self.mixer.loadmusic(1)
@@ -255,8 +255,7 @@ class Game:
     def process_events(self) -> None:
         for event in pygame.event.get():
             if event.type == QUIT:
-                pygame.quit()
-                quit()
+                exit()
 
 
     def process_keyboard_input(self) -> None:
@@ -380,7 +379,7 @@ class Game:
         while True:
             for event in pygame.event.get():
                 if event.type in [QUIT, MOUSEBUTTONDOWN, KEYDOWN]:
-                    quit()
+                    exit()
 
 
     def keep_player_in_bounds(self) -> None:
