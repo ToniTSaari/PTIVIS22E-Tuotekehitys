@@ -378,7 +378,8 @@ class Game:
     
     
     def make_end_text(self, text: str):
-        font = pygame.font.Font(None, 350)
+        font_size = 350 if self.width == 1280 else 250
+        font = pygame.font.Font(None, font_size)
         text_colour = "#202020"
         text_image = font.render(text, True, text_colour)
         text_rect = text_image.get_rect()
