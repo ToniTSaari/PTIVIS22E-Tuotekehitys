@@ -207,35 +207,37 @@ class Game:
                     exit()
 
                 if event.type == pygame.MOUSEBUTTONDOWN:
-                    def resoChange(height, width):
-                        #asetetaan halutut resoluutiot .height ja .width muutujiin ja asetetaan resoluuto näiden muutujien mukaiseksi
-                        self.height = height
-                        self.width = width
-                        self.screen = pygame.display.set_mode((self.width, self.height))
-
-                        #haetaan display dict-muutujaan JSONista tiedot settings.all kautta
-                        display = settings.all["display"]
-
-                        #haetaan dict-muutujaan .height ja .width arvot
-                        display["height"] = self.height
-                        display["width"] = self.width
-
-                        #talletetaan muutokset JSON tiedostoon, "display" osioon ja lähetetään ne .write aliohjelmalle
-                        settings.all["display"] = display
-                        settings.write(settings.all)
 
                     if start_button.collidepoint(mouse_pos):
                         game.main_loop()
 
                     elif big_button.collidepoint(mouse_pos):
-                        resoChange(720,1280)
+                        self.resoChange(720,1280)
                         game.main_menu()
+                        
                     elif small_button.collidepoint(mouse_pos):
-                        resoChange(600,800)
+                        self.resoChange(600,800)
                         game.main_menu()
 
                     elif quit_button.collidepoint(mouse_pos):
                         exit()
+
+    def resoChange(self, height, width):
+        #asetetaan halutut resoluutiot .height ja .width muutujiin ja asetetaan resoluuto näiden muutujien mukaiseksi
+        self.height = height
+        self.width = width
+        self.screen = pygame.display.set_mode((self.width, self.height))
+
+        #haetaan display dict-muutujaan JSONista tiedot settings.all kautta
+        display = settings.all["display"]
+
+        #haetaan dict-muutujaan .height ja .width arvot
+        display["height"] = self.height
+        display["width"] = self.width
+
+        #talletetaan muutokset JSON tiedostoon, "display" osioon ja lähetetään ne .write aliohjelmalle
+        settings.all["display"] = display
+        settings.write(settings.all)
 
     def main_loop(self) -> None:
         self.mixer.loadmusic(1)
