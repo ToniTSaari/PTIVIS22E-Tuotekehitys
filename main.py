@@ -40,6 +40,7 @@ class Game:
         self.width = settings.display["width"]
         self.height = settings.display["height"]
         self.screen = pygame.display.set_mode((self.width, self.height))
+        pygame.display.set_caption("WoodHack: Root of Evil")
 
     def fullscreen_display(self) -> None:
         self.screen = pygame.display.set_mode((0,0), pygame.FULLSCREEN)
