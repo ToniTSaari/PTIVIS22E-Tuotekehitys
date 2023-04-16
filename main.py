@@ -199,11 +199,9 @@ class Game:
 
                     elif self.big_button.collidepoint(mouse_pos):
                         self.resoChange(720,1280)
-                        self.set_button_layout()
                         
                     elif self.small_button.collidepoint(mouse_pos):
                         self.resoChange(600,800)
-                        self.set_button_layout()
 
                     elif self.quit_button.collidepoint(mouse_pos):
                         exit()
@@ -249,6 +247,9 @@ class Game:
         #talletetaan muutokset JSON tiedostoon, "display" osioon ja lähetetään ne .write aliohjelmalle
         settings.all["display"] = display
         settings.write(settings.all)
+
+        # asetellaan menun napit uuden resoluution mukaisesti
+        self.set_button_layout()
 
     def main_loop(self) -> None:
         self.mixer.loadmusic(1)
