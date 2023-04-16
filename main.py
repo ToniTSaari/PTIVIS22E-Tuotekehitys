@@ -98,21 +98,7 @@ class Game:
         temp_highlight = "blue"
         quit_highlight = "red"
 
-        button_w = 320
-        button_h = 100
-        button_x = self.width/2 - button_w/2
-
-        #jakamalla ruudun koko viidellä, saa suhdeluvun neljälle menunapille niin että ylä- ja alareunaan jää bufferialue
-        y_ratio = self.height / 5
-        s_button_y = y_ratio * 1
-        small_button_y = y_ratio * 2
-        big_button_y = y_ratio * 3
-        q_button_y = y_ratio * 4
-
-        start_button = Rect(button_x, s_button_y, button_w, button_h)
-        small_button = Rect(button_x, small_button_y, button_w, button_h)
-        big_button = Rect(button_x, big_button_y, button_w, button_h)
-        quit_button = Rect(button_x, q_button_y, button_w, button_h)
+        self.set_button_layout()
 
         arial = pygame.font.Font(None, 100)
 
@@ -132,25 +118,25 @@ class Game:
             quit_text = arial.render("Quit", True, text_colour)
 
             start_button_colour = \
-                start_highlight if start_button.collidepoint(mouse_pos) \
+                start_highlight if self.start_button.collidepoint(mouse_pos) \
                     else button_colour
 
             big_button_colour = \
-                temp_highlight if big_button.collidepoint(mouse_pos) \
+                temp_highlight if self.big_button.collidepoint(mouse_pos) \
                     else button_colour
             
             small_button_colour = \
-                temp_highlight if small_button.collidepoint(mouse_pos) \
+                temp_highlight if self.small_button.collidepoint(mouse_pos) \
                     else button_colour
             
             quit_button_colour = \
-                quit_highlight if quit_button.collidepoint(mouse_pos) \
+                quit_highlight if self.quit_button.collidepoint(mouse_pos) \
                     else button_colour
 
             pygame.draw.rect(
                 self.screen,
                 start_button_colour,
-                start_button,
+                self.start_button,
                 border_radius=10
             )
 
@@ -158,14 +144,14 @@ class Game:
                 self.screen,
 
                 big_button_colour,
-                big_button,
+                self.big_button,
                 border_radius=10
             )
 
             pygame.draw.rect(
                 self.screen,
                 small_button_colour,
-                small_button,
+                self.small_button,
                 border_radius=10
             )
 
@@ -173,30 +159,30 @@ class Game:
                 self.screen,
 
                 quit_button_colour,
-                quit_button,
+                self.quit_button,
                 border_radius=10
             )
 
             self.screen.blit(
                 start_text,
-                Vector2(start_button.center) - start_text.get_rect().center
+                Vector2(self.start_button.center) - start_text.get_rect().center
             )
 
             self.screen.blit(
 
                 big_text,
-                Vector2(big_button.center) - big_text.get_rect().center
+                Vector2(self.big_button.center) - big_text.get_rect().center
             )
 
             self.screen.blit(
                 small_text,
-                Vector2(small_button.center) - small_text.get_rect().center
+                Vector2(self.small_button.center) - small_text.get_rect().center
             )
 
             self.screen.blit(
 
                 quit_text,
-                Vector2(quit_button.center) - quit_text.get_rect().center
+                Vector2(self.quit_button.center) - quit_text.get_rect().center
             )
 
             pygame.display.update()
@@ -208,19 +194,44 @@ class Game:
 
                 if event.type == pygame.MOUSEBUTTONDOWN:
 
-                    if start_button.collidepoint(mouse_pos):
+                    if self.start_button.collidepoint(mouse_pos):
                         game.main_loop()
 
-                    elif big_button.collidepoint(mouse_pos):
+                    elif self.big_button.collidepoint(mouse_pos):
                         self.resoChange(720,1280)
-                        game.main_menu()
+                        self.set_button_layout()
                         
-                    elif small_button.collidepoint(mouse_pos):
+                    elif self.small_button.collidepoint(mouse_pos):
                         self.resoChange(600,800)
-                        game.main_menu()
+                        self.set_button_layout()
 
-                    elif quit_button.collidepoint(mouse_pos):
+                    elif self.quit_button.collidepoint(mouse_pos):
                         exit()
+
+    def set_button_layout(self):
+        self.button_w = 320
+        self.button_h = 100
+        button_x = self.width/2 - self.button_w/2
+
+        #jakamalla ruudun koko viidellä, saa suhdeluvun neljälle menunapille niin että ylä- ja alareunaan jää bufferialue
+        y_ratio = self.height / 5
+        s_button_y = y_ratio * 1
+        small_button_y = y_ratio * 2
+        big_button_y = y_ratio * 3
+        q_button_y = y_ratio * 4
+
+        self.start_button = Rect(
+            button_x, s_button_y, self.button_w, self.button_h
+        )
+        self.small_button = Rect(
+            button_x, small_button_y, self.button_w, self.button_h
+        )
+        self.big_button = Rect(
+            button_x, big_button_y, self.button_w, self.button_h
+        )
+        self.quit_button = Rect(
+            button_x, q_button_y, self.button_w, self.button_h
+        )
 
     def resoChange(self, height, width):
         #asetetaan halutut resoluutiot .height ja .width muutujiin ja asetetaan resoluuto näiden muutujien mukaiseksi
