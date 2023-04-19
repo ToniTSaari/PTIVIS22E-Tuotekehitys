@@ -1,4 +1,5 @@
 import pygame
+from random import randint
 from bullet import Bullet
 from patterns import Patterns
 
@@ -18,15 +19,21 @@ class Boss(pygame.sprite.Sprite):
 
         self.image = pygame.image.load('assets/art/vihapuu.png').convert_alpha()
 
-        self.rect = self.image.get_rect()
+        self.__rect = self.image.get_rect()
 
-        self.__x = position.x - self.rect.width/2
-        self.__y = position.y - self.rect.height/2
-        self.rect.x = self.__x
-        self.rect.y = self.__y
+        self.__x = position.x - self.__rect.width/2
+        self.__y = position.y - self.__rect.height/2
 
         self.max_hp = 20
         self.hp = self.max_hp
+
+        # for having the boss move around
+        self.original_position = position
+        self.wander_range = 150
+        self.wandering = False
+
+        self.speed = Vector2(0,0)
+        self.speed_multiplier = 2
 
         self.patterns = Patterns()
         self.mask = pygame.mask.from_surface(self.image)
@@ -36,9 +43,31 @@ class Boss(pygame.sprite.Sprite):
         self.shot_cooldown = 120
 
     def update(self) -> None:
-        self.__tick_shot_cooldown()
+        self.__tick_attack_cooldown()
+        self.__wander()
+    
+    def __wander(self) -> None:
+        if self.wandering:
+            self.__x += self.speed.x
+            self.__y += self.speed.y
+            if self.position.distance_to(self.target) < 10:
+                self.wandering = False
+        else:
+            target_offset = Vector2(
+                randint(-self.wander_range, self.wander_range),
+                randint(-self.wander_range, self.wander_range)
+            )
+            self.target = self.original_position + target_offset
+            self.speed = self.target - self.position
+            self.speed.scale_to_length(self.speed_multiplier)
+            self.wandering = True
 
-    def __tick_shot_cooldown(self) -> None:
+    @property
+    def rect(self) -> pygame.Rect:
+        self.__rect.center = self.position
+        return self.__rect
+
+    def __tick_attack_cooldown(self) -> None:
         if self.shot_cooldown > 0:
             self.shot_cooldown -= 1
         else:
@@ -65,7 +94,8 @@ class Boss(pygame.sprite.Sprite):
         
     @property
     def position(self) -> Vector2:
-        return Vector2(self.x, self.y)
+        '''The coordinates of the centre of the boss.'''
+        return Vector2(self.x + self.__rect.width/2, self.y + self.__rect.height/2)
 
     def take_damage(self, amount: int) -> None:
         self.hp = max(self.hp - 1, 0)
