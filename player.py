@@ -164,7 +164,8 @@ class Player(pygame.sprite.Sprite):
 
     def setmovestate(self,angle: float,)-> None:
         if self.speed == [0,0]:
-            self.playerstate=8
+            # don't change state if the player isn't moving
+            pass
         elif -157.5 >= angle or 157.5 <= angle <= 180:
             self.playerstate=0
         elif -112.5 <= angle <= -67.5:
