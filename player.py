@@ -18,7 +18,7 @@ class Player(pygame.sprite.Sprite):
                             pygame.image.load('assets/art/player_u0.png').convert_alpha(),
                             pygame.image.load('assets/art/player_r0.png').convert_alpha(),
                             pygame.image.load('assets/art/player_d0.png').convert_alpha()]
-        self.image = self.player_images[0]
+        self.image = self.player_images[3]
         self.playerstate = Enum ("State",['A','W','D','S','AW','WD','SD','AS',"STILL"])
 
         self._layer = 3
@@ -26,6 +26,9 @@ class Player(pygame.sprite.Sprite):
         self.__width = self.image.get_width()
         self.__height = self.image.get_height()
 
+        self.__hitbox = pygame.Rect(0,0,32,76)
+
+        # the location of the player sprite's top left corner
         self.__x = position.x - self.__width/2
         self.__y = position.y - self.__height/2
 
@@ -41,8 +44,8 @@ class Player(pygame.sprite.Sprite):
 
     @property
     def x(self) -> float:
+        '''The x coordinate of the player's top left corner.'''
         return self.__x
-
 
     @x.setter
     def x(self, new: float) -> None:
@@ -50,6 +53,7 @@ class Player(pygame.sprite.Sprite):
 
     @property
     def y(self) -> float:
+        '''The y coordinate of the player's top left corner.'''
         return self.__y
 
     @y.setter
@@ -58,7 +62,8 @@ class Player(pygame.sprite.Sprite):
 
     @property
     def position(self) -> Vector2:
-        return Vector2(self.x, self.y)
+        '''The coordinates of the centre of the player.'''
+        return Vector2(self.x + self.width/2, self.y + self.height/2)
 
     @property
     def angle(self) -> float:
@@ -75,44 +80,66 @@ class Player(pygame.sprite.Sprite):
 
     @property
     def rect(self) -> pygame.Rect:
+        '''
+        A Rect that shows where the player sprite is.
+        
+        This should only be used by Pygame's built-in functions or 
+        display-related code.
+        '''
         r = self.mask.get_rect()
         (r.left, r.top) = (round(self.x), round(self.y))
         return r
 
     @property
-    def left(self) -> float:
-        """The x coordinate of the left side of the player."""
-        return self.x
+    def hitbox(self) -> pygame.Rect:
+        '''
+        The player's hitbox.
+        
+        Should be used for collision detection with things that
+        damage the player.
+        '''
+        self.__hitbox.center = (self.position.x, self.position.y - 7)
+        return self.__hitbox
 
-    @left.setter
-    def left(self, new: float) -> None:
-        self.x = new
+    # The collider properties have magic numbers that just let the player
+    # get close enough to the edges of the map to look natural.
+    # This is janky but we can live with it.
+    # They're different from the hitbox because they're only used for
+    # visual purposes while the hitbox is used for mechanics.
+    @property
+    def collider_left(self) -> float:
+        """The x coordinate of the left side of the player's collider box."""
+        return self.x + 84
+
+    @collider_left.setter
+    def collider_left(self, new: float) -> None:
+        self.x = new - 84
 
     @property
-    def right(self) -> float:
-        """The x coordinate of the right side of the player."""
-        return self.x + self.width
+    def collider_right(self) -> float:
+        """The x coordinate of the right side of the player's collider box."""
+        return self.x + self.width - 84
 
-    @right.setter
-    def right(self, new: float) -> None:
-        self.x = new - self.width
-
-    @property
-    def top(self) -> float:
-        """The y coordinate of the top of the player."""
-        return self.y
-
-    @top.setter
-    def top(self, new: float) -> None:
-        self.y = new
+    @collider_right.setter
+    def collider_right(self, new: float) -> None:
+        self.x = new - self.width + 84
 
     @property
-    def bottom(self) -> float:
-        """The y coordinate of the bottom of the player."""
+    def collider_top(self) -> float:
+        """The y coordinate of the top of the player's collider box."""
+        return self.y - 6
+
+    @collider_top.setter
+    def collider_top(self, new: float) -> None:
+        self.y = new - 6
+
+    @property
+    def collider_bottom(self) -> float:
+        """The y coordinate of the bottom of the player's collider box."""
         return self.y + self.height
 
-    @bottom.setter
-    def bottom(self, new: float) -> None:
+    @collider_bottom.setter
+    def collider_bottom(self, new: float) -> None:
         self.y = new - self.height
 
     def take_damage(self, amount: int) -> None:

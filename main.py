@@ -347,7 +347,8 @@ class Game:
         '''
         if sprite.spritecollideany(
             target,
-            bullet_group
+            bullet_group,
+            self.check_collision_with_hitbox
         ):
             for _ in sprite.spritecollide(
                 target,
@@ -356,6 +357,28 @@ class Game:
                 sprite.collide_mask
             ):
                 target.take_damage(1)
+
+    def check_collision_with_hitbox(
+        self,
+        first: sprite.Sprite,
+        second: sprite.Sprite
+    ) -> bool:
+        '''
+        Checks if two sprites collide with each other.
+
+        Uses a dedicated hitbox instead of the default rect if possible.
+        '''
+        first_box = first.hitbox if hasattr(first, "hitbox") \
+            else first.rect
+        second_box = second.hitbox if hasattr(second, "hitbox") \
+            else second.rect
+
+        if first_box.colliderect(second_box):
+            return True
+        else:
+            return False
+
+        
 
     def check_game_over(self) -> None:
         if self.boss.hp == 0:
@@ -398,14 +421,14 @@ class Game:
 
 
     def keep_player_in_bounds(self) -> None:
-        if self.player.top < 0:
-            self.player.top = 0
-        if self.player.bottom > self.canvas.inner.get_height():
-            self.player.bottom = self.canvas.inner.get_height()
-        if self.player.right > self.canvas.inner.get_width():
-            self.player.right = self.canvas.inner.get_width()
-        if self.player.left < 0:
-            self.player.left = 0
+        if self.player.collider_top < 0:
+            self.player.collider_top = 0
+        if self.player.collider_bottom > self.canvas.inner.get_height():
+            self.player.collider_bottom = self.canvas.inner.get_height()
+        if self.player.collider_right > self.canvas.inner.get_width():
+            self.player.collider_right = self.canvas.inner.get_width()
+        if self.player.collider_left < 0:
+            self.player.collider_left = 0
 
 
     def render(self) -> None:
